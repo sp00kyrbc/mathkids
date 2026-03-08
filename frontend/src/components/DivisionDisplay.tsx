@@ -269,10 +269,11 @@ export function DivisionDisplay({
 
         {/* Wiersz ilorazu (nad kreska) */}
         <div className="flex">
-          {Array.from({ length: dividendLen }).map((_, i) => {
-            const qi = i - (dividendLen - quotientLen);
-            if (qi < 0) return <div key={i} className={emptyCls} />;
-            const qcell = getQuotientCell(qi);
+          {dividendStr.split('').map((_, i) => {
+            // Znajdz substep ktory ma quotient_col === i
+            const subIdx = substeps.findIndex((s: any) => s.quotient_col === i);
+            if (subIdx === -1) return <div key={i} className={emptyCls} />;
+            const qcell = getQuotientCell(subIdx);
             if (!qcell) return <div key={i} className={emptyCls} />;
             return renderInput(qcell);
           })}

@@ -430,22 +430,19 @@ def _compute_division_steps(dividend: int, divisor: int):
     step_id = 0
     current = 0
     quotient_digits = []
-    last_digit_pos = -1
+    step_count = 0
 
     for i, digit_char in enumerate(dividend_str):
         current = current * 10 + int(digit_char)
 
         if current < divisor and i < len(dividend_str) - 1:
             quotient_digits.append(0)
-            last_digit_pos = i
             continue
 
         q_digit = current // divisor
         product = q_digit * divisor
         remainder = current - product
         quotient_digits.append(q_digit)
-
-        quotient_col = i
 
         # Przeniesienia przy odejmowaniu current - product
         borrow_info = _compute_subtraction_borrows(current, product)
@@ -455,7 +452,7 @@ def _compute_division_steps(dividend: int, divisor: int):
             step_id=step_id,
             position="result",
             row=None,
-            column=len(quotient_digits) - 1,
+            column=step_count,
             result_digit=q_digit,
             description=(
                 f"Biore {current}. "
@@ -478,7 +475,7 @@ def _compute_division_steps(dividend: int, divisor: int):
             steps.append(Step(
                 step_id=step_id,
                 position="product",
-                row=len(substeps),
+                row=step_count,
                 column=pi,
                 result_digit=int(pd),
                 description=f"{q_digit} x {divisor} = {product}. Zapisuje cyfre {pd}.",
@@ -494,7 +491,7 @@ def _compute_division_steps(dividend: int, divisor: int):
             "current_value": current,
             "current_len": current_len,
             "quotient_digit": q_digit,
-            "quotient_col": quotient_col,
+            "quotient_col": i,
             "product": product,
             "product_str": product_str_padded,
             "product_len": current_len,
@@ -502,8 +499,8 @@ def _compute_division_steps(dividend: int, divisor: int):
             "borrow": borrow_info,
         })
 
+        step_count += 1
         current = remainder
-        last_digit_pos = i
 
     return steps, substeps
 
