@@ -28,19 +28,19 @@ const THEORY: Record<string, { title: string; steps: { text: string; visual: str
   multiplication: {
     title: 'Jak mnożyć pod kreską?',
     steps: [
-      { text: 'Mnożymy przez każdą cyfrę mnożnika osobno, od prawej.', visual: '  345\n×  23\n─────' },
-      { text: 'Najpierw 345 × 3 (jedności mnożnika).', visual: '  345\n×  23\n─────\n 1035' },
-      { text: 'Teraz 345 × 2 (dziesiątki). Wynik piszemy z przesunięciem o jedno miejsce w lewo (bo to dziesiątki).', visual: '  345\n×  23\n─────\n 1035\n6900 ' },
-      { text: 'Dodajemy oba wyniki cząstkowe!', visual: '  345\n×  23\n─────\n 1035\n+6900\n─────\n 7935' },
+      { text: 'Mnożymy przez każdą cyfrę mnożnika osobno, od prawej.', visual: '  345\n\u00D7  23\n─────' },
+      { text: 'Najpierw 345 \u00D7 3 (jedności mnożnika).', visual: '  345\n\u00D7  23\n─────\n 1035' },
+      { text: 'Teraz 345 \u00D7 2 (dziesiątki). Wynik piszemy z przesunięciem o jedno miejsce w lewo (bo to dziesiątki).', visual: '  345\n\u00D7  23\n─────\n 1035\n6900 ' },
+      { text: 'Dodajemy oba wyniki cząstkowe!', visual: '  345\n\u00D7  23\n─────\n 1035\n+6900\n─────\n 7935' },
     ]
   },
   division: {
     title: 'Jak dzielić pod kreską?',
     steps: [
       { text: 'Dzielnik piszemy po prawej stronie pionowej kreski. Dzielną po lewej.', visual: '126 | 6\n    |───' },
-      { text: 'Bierzemy cyfry dzielnej od lewej — tyle ile potrzeba by podzielić. 12 ÷ 6 = 2.', visual: '126 | 6\n 12 |───\n    | 2' },
-      { text: 'Zapisujemy 2 w wyniku. Obliczamy 2 × 6 = 12. Odejmujemy od 12: reszta 0.', visual: '126 | 6\n 12 |───\n─── | 2\n  06' },
-      { text: 'Piszemy w dół następną cyfrę dzielnej (6). Teraz 6 ÷ 6 = 1.', visual: '126 | 6\n    |───\n    | 21\nWynik: 21 ✓' },
+      { text: 'Bierzemy cyfry dzielnej od lewej — tyle ile potrzeba by podzielić. 12 \u00F7 6 = 2.', visual: '126 | 6\n 12 |───\n    | 2' },
+      { text: 'Zapisujemy 2 w wyniku. Obliczamy 2 \u00D7 6 = 12. Odejmujemy od 12: reszta 0.', visual: '126 | 6\n 12 |───\n─── | 2\n  06' },
+      { text: 'Piszemy w dół następną cyfrę dzielnej (6). Teraz 6 \u00F7 6 = 1.', visual: '126 | 6\n    |───\n    | 21\nWynik: 21 ✓' },
     ]
   },
 };
@@ -72,7 +72,7 @@ export function TheoryPage() {
 
   return (
     <Layout>
-      <div className="max-w-md mx-auto">
+      <div className="w-full max-w-2xl mx-auto">
         <h2 className={`text-xl font-bold ${classes.text} mb-4 text-center`}>{theory.title}</h2>
 
         {/* Wizualizacja */}
@@ -82,7 +82,7 @@ export function TheoryPage() {
           animate={{ opacity: 1, x: 0 }}
           className={`${classes.gridBg} ${theme === 'chalk' ? 'chalk-texture' : 'notebook-grid'} rounded-2xl p-6 mb-4 font-mono text-center`}
         >
-          <pre className={`text-xl ${classes.text} ${theme === 'chalk' ? 'chalk-text font-chalk' : 'font-notebook'} whitespace-pre`}>
+          <pre className={`text-2xl sm:text-3xl lg:text-4xl ${classes.text} ${theme === 'chalk' ? 'chalk-text font-chalk' : 'font-notebook'} whitespace-pre`}>
             {currentStep.visual}
           </pre>
         </motion.div>

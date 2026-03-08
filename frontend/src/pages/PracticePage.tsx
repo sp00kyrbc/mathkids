@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Layout } from '../components/Layout';
-import { TaskDisplay } from '../components/TaskDisplay';
+import { ArithmeticDisplay } from '../components/ArithmeticDisplay';
 import { XPPopup } from '../components/XPPopup';
 import { useTheme } from '../hooks/useTheme';
 import { useAppStore } from '../store/useAppStore';
@@ -27,7 +27,6 @@ export function PracticePage({ isTutorial = false }: PracticePageProps) {
 
   const [task, setTask] = useState<Task | null>(null);
   const [loading, setLoading] = useState(true);
-  const [currentStep, setCurrentStep] = useState(0);
   const [taskCorrect, setTaskCorrect] = useState(true);
   const [xpGained, setXpGained] = useState<number | null>(null);
   const [tasksCompleted, setTasksCompleted] = useState(0);
@@ -35,7 +34,6 @@ export function PracticePage({ isTutorial = false }: PracticePageProps) {
 
   const fetchTask = useCallback(async () => {
     setLoading(true);
-    setCurrentStep(0);
     setTaskCorrect(true);
     try {
       const op = ops[Math.floor(Math.random() * ops.length)];
@@ -57,9 +55,6 @@ export function PracticePage({ isTutorial = false }: PracticePageProps) {
 
   function handleStepComplete(correct: boolean) {
     if (!correct) setTaskCorrect(false);
-    if (currentStep < (task?.steps.length || 0) - 1) {
-      setCurrentStep(s => s + 1);
-    }
   }
 
   function handleTaskComplete(correct: boolean) {
@@ -85,7 +80,7 @@ export function PracticePage({ isTutorial = false }: PracticePageProps) {
 
   return (
     <Layout>
-      <div className="max-w-md mx-auto">
+      <div className="w-full max-w-2xl mx-auto">
         <div className="flex items-center justify-between mb-4">
           <button onClick={() => navigate('/learn')} className={`text-sm ${classes.text} opacity-60`}>← Wróć</button>
           <div className="flex gap-3">
@@ -113,10 +108,9 @@ export function PracticePage({ isTutorial = false }: PracticePageProps) {
             Przygotowuję zadanie...
           </div>
         ) : task ? (
-          <TaskDisplay
+          <ArithmeticDisplay
             task={task}
             mode={isTutorial ? 'tutorial' : 'practice'}
-            currentStepId={currentStep}
             onStepComplete={handleStepComplete}
             onTaskComplete={handleTaskComplete}
             feedbackMode={activeProfile?.feedbackMode || 'immediate'}

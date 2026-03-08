@@ -49,7 +49,7 @@ export function LearnPage() {
 
   return (
     <Layout>
-      <div className="max-w-md mx-auto">
+      <div className="w-full max-w-2xl mx-auto">
         <motion.h2
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}

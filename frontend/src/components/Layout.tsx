@@ -51,7 +51,7 @@ export function Layout({ children, showHeader = true }: LayoutProps) {
         </header>
       )}
 
-      <main className="p-4">
+      <main className="px-4 py-4 sm:px-6 lg:px-8">
         <AnimatePresence mode="wait">
           {children}
         </AnimatePresence>

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Layout } from '../components/Layout';
-import { TaskDisplay } from '../components/TaskDisplay';
+import { ArithmeticDisplay } from '../components/ArithmeticDisplay';
 import { useTheme } from '../hooks/useTheme';
 import { useAppStore } from '../store/useAppStore';
 import type { Task } from '../types/task';
@@ -112,7 +112,7 @@ export function TestPage() {
 
   return (
     <Layout>
-      <div className="max-w-md mx-auto">
+      <div className="w-full max-w-2xl mx-auto">
         {/* Postęp */}
         <div className="flex items-center justify-between mb-4">
           <span className={`text-sm ${classes.text} opacity-60`}>
@@ -134,10 +134,9 @@ export function TestPage() {
         ) : tasks[currentTaskIndex] ? (
           <AnimatePresence mode="wait">
             <motion.div key={currentTaskIndex} initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1, x: 0 }}>
-              <TaskDisplay
+              <ArithmeticDisplay
                 task={tasks[currentTaskIndex]}
                 mode="test"
-                currentStepId={0}
                 onStepComplete={() => {}}
                 onTaskComplete={handleTaskComplete}
                 feedbackMode="after"

@@ -12,7 +12,8 @@
       "Bash(curl:*)",
       "Bash(taskkill:*)",
       "Bash(npx vite:*)",
-      "Bash(pkill:*)"
+      "Bash(pkill:*)",
+      "Bash(ls:*)"
     ]
   }
 }

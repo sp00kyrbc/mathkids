@@ -21,7 +21,9 @@ mathkids/
 │   ├── 05-exercise-component.md
 │   ├── 06-learning-flow.md
 │   ├── 07-gamification.md
-│   └── 08-gemini-setup.md
+│   ├── 08-gemini-setup.md
+│   ├── 09-bugfix-grid.md
+│   └── 10-bugfix-grid-final.md
 ├── backend/                    ← Node.js + Express (TypeScript)
 │   ├── src/
 │   │   ├── index.ts
@@ -264,5 +266,7 @@ API dostępne na: http://localhost:3001
 6. `docs/06-learning-flow.md` — Tryby nauki
 7. `docs/07-gamification.md` — Nagrody i motywacja
 8. `docs/08-gemini-setup.md` — Konfiguracja Gemini + integracja
+9. `docs/09-bugfix-grid.md` — Naprawa siatki dla wszystkich działań
+10. `docs/10-bugfix-grid-final.md` — Kompletna naprawa siatki (przepisanie od zera)
 
 **WAŻNE**: Przeczytaj CLAUDE.md przed każdym plikiem. Każdy plik docs/ buduje na poprzednim — nie pomijaj kolejności.
