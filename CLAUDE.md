@@ -282,5 +282,16 @@ API dostępne na: http://localhost:3001
 18. `docs/18-pelny-ekran-ui.md` — Pełny ekran, ThemeSwitcher w headerze, ProgressBar, responsywne kratki
 19. `docs/19-kolejnosc-wpisywania.md` — Kolejność wpisywania: cyfra → przeniesienie → następna kolumna
 20. `docs/20-przeniesienia-ukryte.md` — Przeniesienia ukryte do momentu aktywacji, szerokość = szerokość cyfry
+21. `docs/21-symbole-skalowanie-avatar.md` — Centralizacja symboli (symbols.ts), 2× skalowanie UI, avatar → menu
+22. `docs/23-division-algorithm-encoding.md` — Poprawka algorytmu dzielenia (polska metoda), enkodowanie PL→ASCII w Python
+23. `docs/24-division-posrednie.md` — Dzielenie: dziecko wpisuje iloraz + cyfry iloczynu
+24. `docs/26-dzielenie-final-kolumny-przeniesienia.md` — Dzielenie: kolumnowy układ, ukryte przeniesienia, animacja reszty
+25. `docs/27-iloraz-pozycja-kolumny.md` — Poprawka pozycji ilorazu (step_count + quotient_col)
+26. `docs/28-tryb-test-bez-feedbacku.md` — Tryb test: brak feedbacku w trakcie, walidacja na końcu, neutralne kratki
+27. `docs/29-mnozenie-przeniesienia-wynik.md` — Mnożenie: przeniesienia nad wynikiem końcowym (addition_carries), ujednolicone rozmiary kratek
+28. `docs/30-dzielenie-wcięcia-minus.md` — Dzielenie: minus tuż przed iloczynem, poprawne wcięcia, kreska pod minus+cyfry
+29. `docs/31-dzielenie-minus-poza-siatka.md` — Dzielenie: minus w osobnej kolumnie symbolu poza siatką dzielnej, cyfry iloczynu wyrównane z dzielną
+30. `docs/32-dzielenie-przepisywanie-cyfry.md` — Dzielenie: uczeń przepisuje resztę+dociągniętą cyfrę, kroki remainder w Python, revealedSubsteps
+31. `docs/33-dzielenie-z-reszta.md` — Dzielenie z resztą, final_remainder steps, blokada ×/÷ przez 1, result_display
 
 **WAŻNE**: Przeczytaj CLAUDE.md przed każdym plikiem. Każdy plik docs/ buduje na poprzednim — nie pomijaj kolejności.

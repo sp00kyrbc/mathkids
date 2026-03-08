@@ -274,12 +274,14 @@ def _compute_subtraction_steps(a: int, b: int) -> list:
 def _generate_multiplication(max_digits1: int, max_digits2: int) -> dict:
     """Generuje mnozenie. max_digits2 max = 2 dla czytelnosci."""
     max_digits2 = min(max_digits2, 2)
-    a = _random_number(max_digits1)
-    b = _random_number(max_digits2)
+    a = _random_number(max_digits1, min_val=2)
+    b = _random_number(max_digits2, min_val=2)
     if b < 10:
         b = random.randint(2, 9)
+    if a == 1:
+        a = random.randint(2, 10 ** max_digits1 - 1)
     result = a * b
-    steps, partials = _compute_multiplication_steps(a, b)
+    steps, partials, addition_carries = _compute_multiplication_steps(a, b)
     layout = _build_multiplication_layout(a, b, result, partials)
 
     return {
@@ -290,6 +292,7 @@ def _generate_multiplication(max_digits1: int, max_digits2: int) -> dict:
         "remainder": 0,
         "steps": [asdict(s) for s in steps],
         "partials": partials,
+        "addition_carries": addition_carries,
         "layout": layout,
         "difficulty": max_digits1,
         "symbol": "\u00D7",
@@ -362,7 +365,14 @@ def _compute_multiplication_steps(a: int, b: int) -> tuple:
 
     # Wynik koncowy
     result = a * b
-    for col, d in enumerate(reversed(str(result))):
+    result_str = str(result)
+    max_cols = max(len(result_str),
+                   max(len(str(p['value'])) + p['shift'] for p in partials) if partials else 0)
+
+    # Przeniesienia z dodawania kolumn (nad wynikiem)
+    addition_carries = _compute_addition_carries(partials, max_cols)
+
+    for col, d in enumerate(reversed(result_str)):
         all_steps.append(Step(
             step_id=step_id,
             position="result",
@@ -378,7 +388,7 @@ def _compute_multiplication_steps(a: int, b: int) -> tuple:
         ))
         step_id += 1
 
-    return all_steps, partials
+    return all_steps, partials, addition_carries
 
 
 # ─────────────────────────────────────────────
@@ -386,34 +396,38 @@ def _compute_multiplication_steps(a: int, b: int) -> tuple:
 # ─────────────────────────────────────────────
 
 def _generate_division(max_digits1: int, max_digits2: int) -> dict:
-    """Generuje dzielenie bez reszty."""
+    """Generuje dzielenie z reszta lub bez."""
     max_digits2 = min(max_digits2, 2)
 
     for _ in range(100):
         divisor = _random_number(max_digits2, min_val=2)
-        quotient = _random_number(max(1, max_digits1 - max_digits2 + 1), min_val=1)
-        dividend = divisor * quotient
+        if divisor == 1:
+            continue
+        quotient = _random_number(max(1, max_digits1 - max_digits2 + 1), min_val=2)
+        remainder = random.randint(0, divisor - 1)
+        dividend = divisor * quotient + remainder
 
-        dividend_str = str(dividend)
-
-        if len(dividend_str) <= max_digits1:
+        if len(str(dividend)) <= max_digits1:
             break
 
     steps, substeps = _compute_division_steps(dividend, divisor)
-    layout = _build_division_layout(dividend, divisor, quotient, 0, substeps)
+    layout = _build_division_layout(dividend, divisor, quotient, remainder, substeps)
+
+    result_str = str(quotient) if remainder == 0 else f"{quotient} r. {remainder}"
 
     return {
         "operation": "division",
         "operand1": dividend,
         "operand2": divisor,
         "result": quotient,
-        "remainder": 0,
+        "remainder": remainder,
+        "result_display": result_str,
         "steps": [asdict(s) for s in steps],
         "division_steps": substeps,
         "layout": layout,
         "difficulty": len(str(dividend)),
         "symbol": "/",
-        "question": f"{dividend} / {divisor} = ?"
+        "question": f"{dividend} / {divisor} = ?",
     }
 
 
@@ -487,6 +501,32 @@ def _compute_division_steps(dividend: int, divisor: int):
             ))
             step_id += 1
 
+        # Kroki przepisywania reszty+dociagnietej cyfry
+        next_current = None
+        next_current_str = None
+        if i + 1 < len(dividend_str):
+            next_current = remainder * 10 + int(dividend_str[i + 1])
+            next_current_str = str(next_current)
+            for ci, cd in enumerate(next_current_str):
+                steps.append(Step(
+                    step_id=step_id,
+                    position="remainder",
+                    row=step_count,
+                    column=ci,
+                    result_digit=int(cd),
+                    description=(
+                        f"Reszta to {remainder}. "
+                        f"Opuszczam cyfre {dividend_str[i+1]}. "
+                        f"Otrzymuje {next_current}."
+                    ),
+                    hint=f"Przepisz reszte {remainder} i dopisz cyfre {dividend_str[i+1]}.",
+                    carry_in=0,
+                    carry_out=0,
+                    borrow=False,
+                    input_digits=[remainder, int(dividend_str[i + 1])],
+                ))
+                step_id += 1
+
         substeps.append({
             "current_value": current,
             "current_len": current_len,
@@ -497,12 +537,54 @@ def _compute_division_steps(dividend: int, divisor: int):
             "product_len": current_len,
             "remainder": remainder,
             "borrow": borrow_info,
+            "next_current": next_current,
+            "next_current_str": next_current_str,
         })
 
         step_count += 1
         current = remainder
 
+    # Jesli jest reszta koncowa — uczen ja przepisuje
+    if current > 0:
+        remainder_str = str(current)
+        for ci, cd in enumerate(remainder_str):
+            steps.append(Step(
+                step_id=step_id,
+                position="final_remainder",
+                row=len(substeps) - 1,
+                column=ci,
+                result_digit=int(cd),
+                description=f"Reszta z dzielenia to {current}. Nie mozna juz dzielic.",
+                hint=f"Przepisz reszte: {current}",
+                carry_in=0,
+                carry_out=0,
+                borrow=False,
+                input_digits=[current],
+            ))
+            step_id += 1
+
     return steps, substeps
+
+
+def _compute_addition_carries(partials: list, num_cols: int) -> dict:
+    """
+    Oblicza przeniesienia przy sumowaniu wierszy czesciowych mnozenia.
+    Zwraca slownik {col_from_right: carry_value} dla kratek nad wynikiem.
+    """
+    carries = {}
+    carry = 0
+    for col in range(num_cols):
+        col_sum = carry
+        for p in partials:
+            p_str = str(p['value'])
+            shift = p.get('shift', 0)
+            p_col = col - shift
+            if 0 <= p_col < len(p_str):
+                col_sum += int(p_str[-(p_col + 1)])
+        carry = col_sum // 10
+        if carry > 0:
+            carries[col + 1] = carry
+    return carries
 
 
 def _compute_subtraction_borrows(a: int, b: int) -> dict:

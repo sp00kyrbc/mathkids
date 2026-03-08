@@ -42,6 +42,8 @@ export function ArithmeticDisplay({ task, mode, onStepComplete, onTaskComplete, 
   const op2str  = String(task.operand2);
   const resstr  = String(task.result);
   const partials = task.partials || [];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const additionCarries: Record<number, number> = (task as any).addition_carries || {};
 
   // Oblicz szerokość siatki
   const allLens = [op1str.length, op2str.length, resstr.length];
@@ -177,7 +179,7 @@ export function ArithmeticDisplay({ task, mode, onStepComplete, onTaskComplete, 
         }
       });
 
-      // Wynik końcowy — od prawej do lewej
+      // Wynik końcowy — od prawej do lewej, z przeniesieniami z dodawania
       for (let i = gridCols - 1; i >= 0; i--) {
         if (!row_res[i]) continue;
         const colFR = gridCols - 1 - i;
@@ -192,6 +194,23 @@ export function ArithmeticDisplay({ task, mode, onStepComplete, onTaskComplete, 
           status: 'empty',
           stepId: step?.step_id ?? null,
         });
+        // Przeniesienie z dodawania kolumn do następnej kolumny
+        const carryColFR = colFR + 1;
+        if (additionCarries[carryColFR] !== undefined) {
+          const carryGridCol = gridCols - 1 - carryColFR;
+          if (carryGridCol >= 0) {
+            q.push({
+              id: `addcarry-${carryGridCol}`,
+              type: 'carry',
+              row: 98,
+              col: carryGridCol,
+              expected: String(additionCarries[carryColFR]),
+              entered: '',
+              status: 'empty',
+              stepId: null,
+            });
+          }
+        }
       }
     } else {
       // Dodawanie / odejmowanie
@@ -237,6 +256,7 @@ export function ArithmeticDisplay({ task, mode, onStepComplete, onTaskComplete, 
   const [isChecking, setIsChecking] = useState(false);
   const [done, setDone] = useState(false);
   const [unlockedCarries, setUnlockedCarries] = useState<Set<string>>(new Set());
+  const [testAnswers, setTestAnswers] = useState<string[]>([]);
 
   useEffect(() => {
     const q = buildQueue();
@@ -246,6 +266,7 @@ export function ArithmeticDisplay({ task, mode, onStepComplete, onTaskComplete, 
     setIsChecking(false);
     setDone(false);
     setUnlockedCarries(new Set());
+    setTestAnswers([]);
     setTimeout(() => inputRef.current?.focus(), 150);
   }, [task.operand1, task.operand2, task.operation]);
 
@@ -260,7 +281,49 @@ export function ArithmeticDisplay({ task, mode, onStepComplete, onTaskComplete, 
 
     let correct = false;
 
-    if (mode !== 'test' && feedbackMode === 'immediate' && activeCell.stepId !== null) {
+    if (mode === 'test') {
+      // ── TRYB TEST: akceptuj bez oceny, idz dalej ──────────────────
+      correct = true;
+
+      const newQueue = queue.map((c, i) =>
+        i === currentIdx ? { ...c, entered: digit, status: 'correct' as const } : c
+      );
+      setQueue(newQueue);
+
+      setTestAnswers(prev => [...prev, digit]);
+
+      const next = currentIdx + 1;
+      if (next >= newQueue.length) {
+        // Ostatnia cyfra — teraz ocen WSZYSTKO
+        setDone(true);
+
+        const allAnswers = [...testAnswers, digit];
+        const scoredQueue = newQueue.map((c, i) => ({
+          ...c,
+          status: (allAnswers[i] === c.expected ? 'correct' : 'error') as 'correct' | 'error',
+        }));
+        setQueue(scoredQueue);
+
+        setTimeout(() => {
+          const correctCount = allAnswers.filter((ans, i) => ans === newQueue[i]?.expected).length;
+          onTaskComplete(correctCount === allAnswers.length);
+        }, 1800);
+      } else {
+        // Przejdz dalej bez feedbacku
+        const nextCell = newQueue[next];
+        if (nextCell.type === 'carry') {
+          setUnlockedCarries(prev => new Set(prev).add(nextCell.id));
+        }
+        setQueue(newQueue.map((c, i) =>
+          i === next ? { ...c, status: 'active' as const } : c
+        ));
+        setCurrentIdx(next);
+      }
+      return;
+    }
+
+    // ── TRYB LEARN / PRACTICE: natychmiastowy feedback ─────────────
+    if (feedbackMode === 'immediate' && activeCell.stepId !== null) {
       setIsChecking(true);
       try {
         const res = await fetch(`${API}/api/validate/step`, {
@@ -281,7 +344,7 @@ export function ArithmeticDisplay({ task, mode, onStepComplete, onTaskComplete, 
       }
     } else {
       correct = digit === activeCell.expected;
-      if (mode !== 'test') setFeedback({ msg: correct ? 'Brawo! \u2713' : 'Nie, spr\u00f3buj jeszcze raz!', ok: correct });
+      setFeedback({ msg: correct ? 'Brawo! \u2713' : 'Nie, spr\u00f3buj jeszcze raz!', ok: correct });
     }
 
     const newQueue = queue.map((c, i) =>
@@ -311,23 +374,32 @@ export function ArithmeticDisplay({ task, mode, onStepComplete, onTaskComplete, 
         setFeedback(null);
       }, 1400);
     }
-  }, [done, isChecking, activeCell, currentIdx, queue, task, mode, feedbackMode]);
+  }, [done, isChecking, activeCell, currentIdx, queue, task, mode, feedbackMode, testAnswers, onStepComplete, onTaskComplete]);
 
   useEffect(() => {
-    const h = (e: KeyboardEvent) => { if (e.key >= '0' && e.key <= '9') handleDigit(e.key); };
+    const h = (e: KeyboardEvent) => { if (e.key >= '0' && e.key <= '9') { e.preventDefault(); handleDigit(e.key); } };
     window.addEventListener('keydown', h);
     return () => window.removeEventListener('keydown', h);
   }, [handleDigit]);
 
   // ── Style ──────────────────────────────────────────────────────────────
-  const CELL_SIZE = 'w-14 h-14 sm:w-16 sm:h-16 lg:w-20 lg:h-20';
-  const FONT_SIZE = 'text-3xl sm:text-4xl lg:text-5xl';
+  const CELL_W  = 'w-12 sm:w-14 lg:w-16';
+  const CELL_H  = 'h-12 sm:h-14 lg:h-16';
+  const CELL_Hs = 'h-6 sm:h-7 lg:h-8';
+
+  const CELL_SIZE  = `${CELL_W} ${CELL_H}`;
+  const CELL_SIZEs = `${CELL_W} ${CELL_Hs}`;
+
+  const FONT_SIZE  = 'text-2xl sm:text-3xl lg:text-4xl';
+  const FONT_SIZEs = 'text-xs sm:text-sm';
+
   const DIGIT_CLS = `${CELL_SIZE} flex items-center justify-center ${FONT_SIZE} font-bold rounded
     ${classes.font}
     ${theme === 'chalk'
       ? 'text-chalk-text chalk-text border border-chalk-text/30 bg-chalk-text/5'
       : 'text-notebook-text border border-notebook-text/25 bg-black/5'}`;
   const EMPTY_CLS = `${CELL_SIZE} flex items-center justify-center`;
+  const EMPTY_CLSs = `${CELL_W} ${CELL_Hs}`;
   const LINE_CLS  = `border-t-2 my-1 ${theme === 'chalk' ? 'border-chalk-text' : 'border-notebook-text'}`;
   const SYM_CLS   = `${CELL_SIZE} flex items-center justify-center ${FONT_SIZE} font-bold rounded
     ${classes.font}
@@ -336,6 +408,7 @@ export function ArithmeticDisplay({ task, mode, onStepComplete, onTaskComplete, 
   function renderInputCell(cell: Cell) {
     const isActive = activeCell?.id === cell.id;
     const isCarry  = cell.type === 'carry';
+    const isTestInProgress = mode === 'test' && !done;
 
     return (
       <motion.div
@@ -344,17 +417,22 @@ export function ArithmeticDisplay({ task, mode, onStepComplete, onTaskComplete, 
         whileTap={{ scale: 0.88 }}
         className={`
           ${isCarry
-            ? `${CELL_SIZE.split(' ').filter(c => c.startsWith('w-') || c.startsWith('sm:w-') || c.startsWith('lg:w-')).join(' ')} h-7 sm:h-8 text-sm sm:text-base`
+            ? `${CELL_SIZEs} ${FONT_SIZEs}`
             : `${CELL_SIZE} ${FONT_SIZE}`}
           flex items-center justify-center
           font-bold rounded cursor-pointer transition-all select-none
           ${classes.font}
-          ${cell.status === 'correct'
+          ${isTestInProgress && cell.entered
+            ? theme === 'chalk'
+              ? 'border border-chalk-text/50 text-chalk-text bg-chalk-text/10'
+              : 'border border-gray-400 text-gray-700 bg-gray-100'
+            : ''}
+          ${!isTestInProgress && cell.status === 'correct'
             ? theme === 'chalk'
               ? 'border border-chalk-success bg-chalk-success/15 text-chalk-success'
               : 'border border-green-400 bg-green-50 text-green-700'
             : ''}
-          ${cell.status === 'error'
+          ${!isTestInProgress && cell.status === 'error'
             ? `animate-shake border-2 ${theme === 'chalk'
                 ? 'border-chalk-error bg-chalk-error/15 text-chalk-error'
                 : 'border-red-400 bg-red-50 text-red-600'}`
@@ -445,10 +523,10 @@ export function ArithmeticDisplay({ task, mode, onStepComplete, onTaskComplete, 
         {/* Wiersz przeniesień dodawania */}
         {isAdd && (
           <div className="flex">
-            <div className={EMPTY_CLS} />
+            <div className={EMPTY_CLSs} />
             {row_op1.map((_, i) => {
               const carryCell = getAddCarryCell(i);
-              if (!carryCell) return <div key={i} className={EMPTY_CLS} />;
+              if (!carryCell) return <div key={i} className={EMPTY_CLSs} />;
 
               const isUnlocked = unlockedCarries.has(carryCell.id);
               const isActiveCarry = activeCell?.id === carryCell.id;
@@ -457,7 +535,7 @@ export function ArithmeticDisplay({ task, mode, onStepComplete, onTaskComplete, 
                 return (
                   <div
                     key={i}
-                    className={`${CELL_SIZE.split(' ').filter(c => c.startsWith('w-') || c.startsWith('sm:w-') || c.startsWith('lg:w-')).join(' ')} h-7 sm:h-8 flex items-center justify-center cursor-pointer rounded opacity-0 hover:opacity-30 transition-opacity`}
+                    className={`${CELL_SIZEs} flex items-center justify-center cursor-pointer rounded opacity-0 hover:opacity-30 transition-opacity`}
                     onClick={() => setUnlockedCarries(prev => new Set(prev).add(carryCell.id))}
                   />
                 );
@@ -498,21 +576,21 @@ export function ArithmeticDisplay({ task, mode, onStepComplete, onTaskComplete, 
               {/* Wiersz przeniesień — zawsze renderowany (żeby zachować wyrównanie) */}
               {isMultiply && (
                 <div className="flex">
-                  <div className={EMPTY_CLS} />
+                  <div className={EMPTY_CLSs} />
                   {Array.from({ length: gridCols }).map((_, col) => {
                     const carryCell = getInputCell('carry', pi, col);
                     const isUnlocked = carryCell && unlockedCarries.has(carryCell.id);
                     const isActiveCarry = carryCell && activeCell?.id === carryCell.id;
 
                     if (!carryCell) {
-                      return <div key={col} className={EMPTY_CLS} />;
+                      return <div key={col} className={EMPTY_CLSs} />;
                     }
 
                     if (!isUnlocked && !isActiveCarry) {
                       return (
                         <div
                           key={col}
-                          className={`${CELL_SIZE} flex items-center justify-center cursor-pointer rounded opacity-0 hover:opacity-30 transition-opacity`}
+                          className={`${CELL_SIZEs} flex items-center justify-center cursor-pointer rounded opacity-0 hover:opacity-30 transition-opacity`}
                           title="Kliknij żeby zapisać przeniesienie"
                           onClick={() => {
                             setUnlockedCarries(prev => new Set(prev).add(carryCell.id));
@@ -547,6 +625,37 @@ export function ArithmeticDisplay({ task, mode, onStepComplete, onTaskComplete, 
 
         {/* Kreska 2 (tylko mnożenie wielocyfrowe) */}
         {isMultiply && partials.length > 1 && <div className={LINE_CLS} />}
+
+        {/* Przeniesienia z dodawania — nad wynikiem końcowym (mnożenie) */}
+        {isMultiply && Object.keys(additionCarries).length > 0 && (
+          <div className="flex">
+            <div className={EMPTY_CLSs} />
+            {Array.from({ length: gridCols }).map((_, col) => {
+              const colFR = gridCols - 1 - col;
+              const carryVal = additionCarries[colFR];
+              const carryKey = `addcarry-${col}`;
+
+              if (!carryVal) return <div key={col} className={EMPTY_CLSs} />;
+
+              const isUnlocked = unlockedCarries.has(carryKey);
+              const carryCell = queue.find(c => c.id === carryKey);
+              const isActiveCarry = carryCell && activeCell?.id === carryCell.id;
+
+              if (!isUnlocked && !isActiveCarry) {
+                return (
+                  <div
+                    key={col}
+                    className={`${CELL_SIZEs} flex items-center justify-center cursor-pointer rounded opacity-0 hover:opacity-30 transition-opacity`}
+                    onClick={() => setUnlockedCarries(prev => new Set(prev).add(carryKey))}
+                  />
+                );
+              }
+
+              if (!carryCell) return <div key={col} className={EMPTY_CLSs} />;
+              return renderInputCell(carryCell);
+            })}
+          </div>
+        )}
 
         {/* Wynik */}
         <div className="flex">
