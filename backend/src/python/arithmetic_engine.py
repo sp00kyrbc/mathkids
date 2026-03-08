@@ -1,7 +1,8 @@
+# -*- coding: utf-8 -*-
 #!/usr/bin/env python3
 """
 Silnik arytmetyczny dla MathKids.
-Generuje zadania i oblicza kroki działań pisemnych.
+Generuje zadania i oblicza kroki dzialan pisemnych.
 """
 
 import json
@@ -17,49 +18,38 @@ from dataclasses import dataclass, asdict
 
 @dataclass
 class Step:
-    """Jeden krok działania pisemnego."""
+    """Jeden krok dzialania pisemnego."""
     step_id: int           # numer kroku (0-indexed)
-    description: str       # opis po polsku np. "Dodaję cyfry jedności: 6 + 7 = 13"
-    column: int            # której kolumny dotyczy (0 = jedności, 1 = dziesiątki, ...)
-    input_digits: list     # cyfry wejściowe w tej kolumnie
-    result_digit: int      # cyfra którą wpisujemy w wynik
-    carry_in: int          # przeniesienie wchodzące (0 lub 1)
-    carry_out: int         # przeniesienie wychodzące (0 lub 1)
-    borrow: bool           # czy pożyczyliśmy (odejmowanie)
+    description: str       # opis np. "Dodaje cyfry jednosci: 6 + 7 = 13"
+    column: int            # ktorej kolumny dotyczy (0 = jednosci, 1 = dziesiatki, ...)
+    input_digits: list     # cyfry wejsciowe w tej kolumnie
+    result_digit: int      # cyfra ktora wpisujemy w wynik
+    carry_in: int          # przeniesienie wchodzace (0 lub 1)
+    carry_out: int         # przeniesienie wychodzace (0 lub 1)
+    borrow: bool           # czy pozyczylismy (odejmowanie)
     position: str          # "result" | "carry" | "partial" | "remainder"
-    row: Optional[int]     # dla mnożenia: numer wiersza cząstkowego
-    hint: str              # wskazówka dla dziecka
+    row: Optional[int]     # dla mnozenia: numer wiersza czastkowego
+    hint: str              # wskazowka dla dziecka
 
 
 @dataclass
 class ArithmeticTask:
-    """Pełne zadanie z krokami."""
+    """Pelne zadanie z krokami."""
     operation: str         # "addition" | "subtraction" | "multiplication" | "division"
     operand1: int
     operand2: int
     result: int
     remainder: int         # dla dzielenia
     steps: list            # lista Step
-    layout: dict           # układ graficzny (siatka)
+    layout: dict           # uklad graficzny (siatka)
     difficulty: int        # 1-5
 
 
 # ─────────────────────────────────────────────
-# GENERATOR ZADAŃ
+# GENERATOR ZADAN
 # ─────────────────────────────────────────────
 
 def generate_task(operation: str, max_digits1: int, max_digits2: int) -> dict:
-    """
-    Generuje zadanie i oblicza wszystkie kroki.
-
-    Args:
-        operation: "addition" | "subtraction" | "multiplication" | "division"
-        max_digits1: maks liczba cyfr pierwszego składnika (1-6)
-        max_digits2: maks liczba cyfr drugiego składnika (1-6)
-
-    Returns:
-        dict z pełnym zadaniem i krokami
-    """
     if operation == "addition":
         return _generate_addition(max_digits1, max_digits2)
     elif operation == "subtraction":
@@ -69,11 +59,11 @@ def generate_task(operation: str, max_digits1: int, max_digits2: int) -> dict:
     elif operation == "division":
         return _generate_division(max_digits1, max_digits2)
     else:
-        raise ValueError(f"Nieznana operacja: {operation}")
+        raise ValueError(f"Unknown operation: {operation}")
 
 
 def _random_number(max_digits: int, min_val: int = 1) -> int:
-    """Losuje liczbę o maksymalnie max_digits cyfrach."""
+    """Losuje liczbe o maksymalnie max_digits cyfrach."""
     max_val = 10 ** max_digits - 1
     min_val = max(min_val, 10 ** (max(1, max_digits - 1) - 1))
     if max_digits == 1:
@@ -107,22 +97,21 @@ def _generate_addition(max_digits1: int, max_digits2: int) -> dict:
 
 
 def _compute_addition_steps(a: int, b: int) -> list:
-    """Oblicza kroki dodawania pod kreską."""
+    """Oblicza kroki dodawania pod kreska."""
     digits_a = _to_digits(a)
     digits_b = _to_digits(b)
-    max_len = max(len(digits_a), len(digits_b)) + 1  # +1 na ewentualne przeniesienie
+    max_len = max(len(digits_a), len(digits_b)) + 1
 
-    # Wyrównaj do tej samej długości (wypełnij zerami z lewej)
     digits_a = [0] * (max_len - len(digits_a)) + digits_a
     digits_b = [0] * (max_len - len(digits_b)) + digits_b
 
     steps = []
     carry = 0
     step_id = 0
-    position_names = ["jedności", "dziesiątek", "setek", "tysięcy", "dziesiątek tysięcy", "setek tysięcy"]
+    position_names = ["jednosci", "dziesiatek", "setek", "tysiecy", "dziesiatek tysiecy", "setek tysiecy"]
 
     for col in range(max_len - 1, -1, -1):
-        col_index = max_len - 1 - col  # 0 = jedności
+        col_index = max_len - 1 - col
         d_a = digits_a[col]
         d_b = digits_b[col]
         total = d_a + d_b + carry
@@ -132,18 +121,17 @@ def _compute_addition_steps(a: int, b: int) -> list:
         pos_name = position_names[min(col_index, len(position_names) - 1)]
 
         if d_a == 0 and d_b == 0 and carry == 0:
-            break  # Nie ma więcej cyfr
+            break
 
-        # Opis kroku
         if carry > 0:
-            desc = f"Dodaję cyfry {pos_name}: {d_a} + {d_b} + {carry} (przeniesienie) = {total}"
+            desc = f"Dodaje cyfry {pos_name}: {d_a} + {d_b} + {carry} (przeniesienie) = {total}"
         else:
-            desc = f"Dodaję cyfry {pos_name}: {d_a} + {d_b} = {total}"
+            desc = f"Dodaje cyfry {pos_name}: {d_a} + {d_b} = {total}"
 
         if new_carry > 0:
-            desc += f". Zapisuję {result_digit}, przenoszę {new_carry}."
+            desc += f". Zapisuje {result_digit}, przenosze {new_carry}."
         else:
-            desc += f". Zapisuję {result_digit}."
+            desc += f". Zapisuje {result_digit}."
 
         hint = f"Ile to {d_a} + {d_b}" + (f" + {carry}" if carry > 0 else "") + "?"
 
@@ -163,11 +151,10 @@ def _compute_addition_steps(a: int, b: int) -> list:
         steps.append(step)
         step_id += 1
 
-        # Dodaj krok przeniesienia jeśli jest
         if new_carry > 0:
             carry_step = Step(
                 step_id=step_id,
-                description=f"Przenoszę {new_carry} na kolumnę {position_names[min(col_index+1, len(position_names)-1)]}.",
+                description=f"Przenosze {new_carry} na kolumne {position_names[min(col_index+1, len(position_names)-1)]}.",
                 column=col_index + 1,
                 input_digits=[],
                 result_digit=new_carry,
@@ -176,7 +163,7 @@ def _compute_addition_steps(a: int, b: int) -> list:
                 borrow=False,
                 position="carry",
                 row=None,
-                hint=f"Zapiszę przeniesienie {new_carry} nad następną kolumną."
+                hint=f"Zapisze przeniesienie {new_carry} nad nastepna kolumna."
             )
             steps.append(carry_step)
             step_id += 1
@@ -195,7 +182,7 @@ def _generate_subtraction(max_digits1: int, max_digits2: int) -> dict:
     a = _random_number(max_digits1)
     b = _random_number(min(max_digits2, max_digits1))
     if b > a:
-        a, b = b, a  # Zamień żeby wynik był nieujemny
+        a, b = b, a
     if a == b:
         a += random.randint(1, 9)
     result = a - b
@@ -217,7 +204,7 @@ def _generate_subtraction(max_digits1: int, max_digits2: int) -> dict:
 
 
 def _compute_subtraction_steps(a: int, b: int) -> list:
-    """Oblicza kroki odejmowania pod kreską (z pożyczaniem)."""
+    """Oblicza kroki odejmowania pod kreska (z pozyczaniem)."""
     digits_a = _to_digits(a)
     digits_b = _to_digits(b)
     max_len = max(len(digits_a), len(digits_b))
@@ -225,12 +212,11 @@ def _compute_subtraction_steps(a: int, b: int) -> list:
     digits_a = [0] * (max_len - len(digits_a)) + digits_a
     digits_b = [0] * (max_len - len(digits_b)) + digits_b
 
-    # Kopia do modyfikacji (pożyczanie)
     working_a = digits_a[:]
 
     steps = []
     step_id = 0
-    position_names = ["jedności", "dziesiątek", "setek", "tysięcy", "dziesiątek tysięcy", "setek tysięcy"]
+    position_names = ["jednosci", "dziesiatek", "setek", "tysiecy", "dziesiatek tysiecy", "setek tysiecy"]
 
     for col in range(max_len - 1, -1, -1):
         col_index = max_len - 1 - col
@@ -244,12 +230,10 @@ def _compute_subtraction_steps(a: int, b: int) -> list:
         borrowed = False
 
         if d_a < d_b:
-            # Pożyczamy z lewej kolumny
             borrowed = True
-            # Znajdź pierwszą niezerową kolumnę po lewej
             borrow_col = col - 1
             while borrow_col >= 0 and working_a[borrow_col] == 0:
-                working_a[borrow_col] += 9  # 0 → 10, oddamy 1 = 9
+                working_a[borrow_col] += 9
                 borrow_col -= 1
             working_a[borrow_col] -= 1
             d_a += 10
@@ -258,10 +242,10 @@ def _compute_subtraction_steps(a: int, b: int) -> list:
         result_digit = d_a - d_b
 
         if borrowed:
-            desc = f"Odejmuj\u0119 cyfry {pos_name}: {d_a - 10} jest za ma\u0142e, po\u017Cyczam 10. {d_a} \u2212 {d_b} = {result_digit}."
-            hint = f"{d_a - 10} jest mniejsze ni\u017C {d_b}. Po\u017Cycz 10 z s\u0105siedniej kolumny i oblicz {d_a} \u2212 {d_b}."
+            desc = f"Odejmuje cyfry {pos_name}: {d_a - 10} jest za male, pozyczam 10. {d_a} \u2212 {d_b} = {result_digit}."
+            hint = f"{d_a - 10} jest mniejsze niz {d_b}. Pozycz 10 z sasiedniej kolumny i oblicz {d_a} \u2212 {d_b}."
         else:
-            desc = f"Odejmuj\u0119 cyfry {pos_name}: {d_a} \u2212 {d_b} = {result_digit}."
+            desc = f"Odejmuje cyfry {pos_name}: {d_a} \u2212 {d_b} = {result_digit}."
             hint = f"Ile to {d_a} \u2212 {d_b}?"
 
         step = Step(
@@ -284,11 +268,11 @@ def _compute_subtraction_steps(a: int, b: int) -> list:
 
 
 # ─────────────────────────────────────────────
-# MNOŻENIE
+# MNOZENIE
 # ─────────────────────────────────────────────
 
 def _generate_multiplication(max_digits1: int, max_digits2: int) -> dict:
-    """Generuje mnożenie. max_digits2 max = 2 dla czytelności."""
+    """Generuje mnozenie. max_digits2 max = 2 dla czytelnosci."""
     max_digits2 = min(max_digits2, 2)
     a = _random_number(max_digits1)
     b = _random_number(max_digits2)
@@ -314,9 +298,9 @@ def _generate_multiplication(max_digits1: int, max_digits2: int) -> dict:
 
 
 def _compute_multiplication_steps(a: int, b: int) -> tuple:
-    """Oblicza kroki mnożenia pod kreską (polska szkoła)."""
+    """Oblicza kroki mnozenia pod kreska (polska szkola)."""
     b_str = str(b)
-    b_digits = [int(c) for c in reversed(b_str)]  # jedności pierwsze
+    b_digits = [int(c) for c in reversed(b_str)]
     a_str = str(a)
     a_digits_rev = [int(c) for c in reversed(a_str)]
 
@@ -327,7 +311,6 @@ def _compute_multiplication_steps(a: int, b: int) -> tuple:
     for shift, digit_b in enumerate(b_digits):
         partial_value = a * digit_b
 
-        # Oblicz przeniesienia wiersza cząstkowego
         carry = 0
         carries_for_row = {}
         for col, digit_a in enumerate(a_digits_rev):
@@ -343,7 +326,7 @@ def _compute_multiplication_steps(a: int, b: int) -> tuple:
             "carries": carries_for_row,
         })
 
-        # Kroki przeniesień (carry) — dziecko je wpisuje
+        # Kroki przeniesien (carry)
         for col_fr, carry_val in sorted(carries_for_row.items()):
             all_steps.append(Step(
                 step_id=step_id,
@@ -351,8 +334,8 @@ def _compute_multiplication_steps(a: int, b: int) -> tuple:
                 row=shift,
                 column=col_fr,
                 result_digit=carry_val,
-                description=f"Przenosz\u0119 {carry_val} do nast\u0119pnej kolumny (wiersz {shift+1}).",
-                hint="Ile przenosz\u0119?",
+                description=f"Przenosze {carry_val} do nastepnej kolumny (wiersz {shift+1}).",
+                hint="Ile przenosze?",
                 carry_in=0,
                 carry_out=carry_val,
                 borrow=False,
@@ -360,7 +343,7 @@ def _compute_multiplication_steps(a: int, b: int) -> tuple:
             ))
             step_id += 1
 
-        # Kroki cyfr wyniku cząstkowego (od prawej)
+        # Kroki cyfr wyniku czastkowego (od prawej)
         for col, d in enumerate(reversed(str(partial_value))):
             all_steps.append(Step(
                 step_id=step_id,
@@ -368,7 +351,7 @@ def _compute_multiplication_steps(a: int, b: int) -> tuple:
                 row=shift,
                 column=col,
                 result_digit=int(d),
-                description=f"Mno\u017C\u0119: {a_str[-(col+1)] if col < len(a_str) else 0} \u00D7 {digit_b}. Cyfra: {d}.",
+                description=f"Mnoze: {a_str[-(col+1)] if col < len(a_str) else 0} \u00D7 {digit_b}. Cyfra: {d}.",
                 hint=f"Ile to {digit_b} \u00D7 ... ?",
                 carry_in=0,
                 carry_out=0,
@@ -377,7 +360,7 @@ def _compute_multiplication_steps(a: int, b: int) -> tuple:
             ))
             step_id += 1
 
-    # Wynik końcowy
+    # Wynik koncowy
     result = a * b
     for col, d in enumerate(reversed(str(result))):
         all_steps.append(Step(
@@ -386,8 +369,8 @@ def _compute_multiplication_steps(a: int, b: int) -> tuple:
             row=None,
             column=col,
             result_digit=int(d),
-            description=f"Dodaj wyniki cz\u0105stkowe. Cyfra wyniku: {d}.",
-            hint="Dodaj kolumn\u0119 pionowo.",
+            description=f"Dodaj wyniki czastkowe. Cyfra wyniku: {d}.",
+            hint="Dodaj kolumne pionowo.",
             carry_in=0,
             carry_out=0,
             borrow=False,
@@ -403,16 +386,18 @@ def _compute_multiplication_steps(a: int, b: int) -> tuple:
 # ─────────────────────────────────────────────
 
 def _generate_division(max_digits1: int, max_digits2: int) -> dict:
-    """Generuje dzielenie bez reszty (dla uproszczenia v1)."""
-    max_digits2 = min(max_digits2, 2)  # dzielnik max 2 cyfrowy
-    divisor = _random_number(max_digits2, min_val=2)
-    quotient = _random_number(max(1, max_digits1 - max_digits2 + 1))
-    dividend = divisor * quotient
+    """Generuje dzielenie bez reszty."""
+    max_digits2 = min(max_digits2, 2)
 
-    # Upewnij się że dzielna ma odpowiednią liczbę cyfr
-    while len(str(dividend)) > max_digits1:
-        quotient = _random_number(max(1, max_digits1 - max_digits2))
+    for _ in range(100):
+        divisor = _random_number(max_digits2, min_val=2)
+        quotient = _random_number(max(1, max_digits1 - max_digits2 + 1), min_val=1)
         dividend = divisor * quotient
+
+        dividend_str = str(dividend)
+
+        if len(dividend_str) <= max_digits1:
+            break
 
     steps, substeps = _compute_division_steps(dividend, divisor)
     layout = _build_division_layout(dividend, divisor, quotient, 0, substeps)
@@ -427,75 +412,130 @@ def _generate_division(max_digits1: int, max_digits2: int) -> dict:
         "division_steps": substeps,
         "layout": layout,
         "difficulty": len(str(dividend)),
-        "symbol": "\u00F7",
-        "question": f"{dividend} \u00F7 {divisor} = ?"
+        "symbol": "/",
+        "question": f"{dividend} / {divisor} = ?"
     }
 
 
-def _compute_division_steps(dividend: int, divisor: int) -> tuple:
-    """Oblicza kroki dzielenia pisemnego (polska metoda)."""
+def _compute_division_steps(dividend: int, divisor: int):
+    """
+    Polska metoda dzielenia pisemnego.
+    Bierzemy cyfry od lewej az liczba >= dzielnik.
+    Generuje kroki: cyfra ilorazu + cyfry iloczynu do wpisania.
+    Substeps zawieraja info o pozycji kolumnowej i przeniesieniach.
+    """
     dividend_str = str(dividend)
     steps = []
-    substeps = []  # podkroki: bieżąca reszta, cyfra wyniku, iloczyn
+    substeps = []
     step_id = 0
-
     current = 0
     quotient_digits = []
+    last_digit_pos = -1
 
     for i, digit_char in enumerate(dividend_str):
         current = current * 10 + int(digit_char)
+
+        if current < divisor and i < len(dividend_str) - 1:
+            quotient_digits.append(0)
+            last_digit_pos = i
+            continue
+
         q_digit = current // divisor
         product = q_digit * divisor
         remainder = current - product
-
         quotient_digits.append(q_digit)
 
-        desc = f"Bior\u0119 {current}. {current} \u00F7 {divisor} = {q_digit} (bo {q_digit} \u00D7 {divisor} = {product}). Reszta: {remainder}."
-        hint = f"Ile razy {divisor} mie\u015Bci si\u0119 w {current}?"
+        quotient_col = i
 
-        substep = {
-            "position": i,
-            "current_value": current,
-            "quotient_digit": q_digit,
-            "product": product,
-            "remainder": remainder,
-            "digits_taken": dividend_str[:i+1]
-        }
-        substeps.append(substep)
+        # Przeniesienia przy odejmowaniu current - product
+        borrow_info = _compute_subtraction_borrows(current, product)
 
-        step = Step(
+        # Krok: cyfra ilorazu
+        steps.append(Step(
             step_id=step_id,
-            description=desc,
-            column=i,
-            input_digits=[current, divisor],
-            result_digit=q_digit,
-            carry_in=0,
-            carry_out=remainder,
-            borrow=False,
             position="result",
             row=None,
-            hint=hint
-        )
-        steps.append(step)
+            column=len(quotient_digits) - 1,
+            result_digit=q_digit,
+            description=(
+                f"Biore {current}. "
+                f"Ile razy {divisor} miesci sie w {current}? "
+                f"{q_digit} razy, bo {q_digit} x {divisor} = {product}."
+            ),
+            hint=f"Ile razy {divisor} miesci sie w {current}?",
+            carry_in=0,
+            carry_out=0,
+            borrow=False,
+            input_digits=[current, divisor],
+        ))
         step_id += 1
 
+        # Kroki: cyfry iloczynu od lewej do prawej
+        current_len = len(str(current))
+        product_str_padded = str(product).zfill(current_len)
+
+        for pi, pd in enumerate(product_str_padded):
+            steps.append(Step(
+                step_id=step_id,
+                position="product",
+                row=len(substeps),
+                column=pi,
+                result_digit=int(pd),
+                description=f"{q_digit} x {divisor} = {product}. Zapisuje cyfre {pd}.",
+                hint=f"Ile to {q_digit} x {divisor}?",
+                carry_in=0,
+                carry_out=0,
+                borrow=False,
+                input_digits=[q_digit, divisor],
+            ))
+            step_id += 1
+
+        substeps.append({
+            "current_value": current,
+            "current_len": current_len,
+            "quotient_digit": q_digit,
+            "quotient_col": quotient_col,
+            "product": product,
+            "product_str": product_str_padded,
+            "product_len": current_len,
+            "remainder": remainder,
+            "borrow": borrow_info,
+        })
+
         current = remainder
+        last_digit_pos = i
 
     return steps, substeps
 
 
+def _compute_subtraction_borrows(a: int, b: int) -> dict:
+    """Pozyczanie przy odejmowaniu a - b. Zwraca {indeks_od_lewej: 1}."""
+    a_str = str(a)
+    b_str = str(b).zfill(len(a_str))
+    n = len(a_str)
+    borrows = {}
+    borrow = 0
+    for i in range(n - 1, -1, -1):
+        da = int(a_str[i]) - borrow
+        db = int(b_str[i])
+        if da < db:
+            borrows[i] = 1
+            borrow = 1
+        else:
+            borrow = 0
+    return borrows
+
+
 # ─────────────────────────────────────────────
-# UKŁADY GRAFICZNE (layout)
+# UKLADY GRAFICZNE (layout)
 # ─────────────────────────────────────────────
 
 def _build_addition_layout(a: int, b: int, result: int, steps: list) -> dict:
-    """Buduje układ graficzny dla dodawania (siatka kratek)."""
     a_str = str(a)
     b_str = str(b)
     r_str = str(result)
     max_len = max(len(a_str), len(b_str), len(r_str))
 
-    # Przeniesienia
     carries = {}
     for s in steps:
         if s.position == "carry":
@@ -503,8 +543,8 @@ def _build_addition_layout(a: int, b: int, result: int, steps: list) -> dict:
 
     return {
         "type": "vertical",
-        "cols": max_len + 2,  # +2 na margines i ewentualne przeniesienia
-        "rows": 5,  # carries, a, b, linia, wynik
+        "cols": max_len + 2,
+        "rows": 5,
         "carries_row": 0,
         "operand1_row": 1,
         "operand2_row": 2,
@@ -582,24 +622,18 @@ def _build_division_layout(dividend: int, divisor: int, quotient: int, remainder
 # ─────────────────────────────────────────────
 
 def validate_step(operation: str, step_id: int, task_data: dict, user_answer: int) -> dict:
-    """
-    Waliduje odpowiedź dziecka dla konkretnego kroku.
-
-    Returns:
-        dict: { correct: bool, expected: int, feedback: str }
-    """
     steps = task_data.get("steps", [])
     if step_id >= len(steps):
-        return {"correct": False, "expected": -1, "feedback": "Nieprawidłowy numer kroku."}
+        return {"correct": False, "expected": -1, "feedback": "Nieprawidlowy numer kroku."}
 
     step = steps[step_id]
     expected = step["result_digit"]
     correct = user_answer == expected
 
     if correct:
-        feedback = "Świetnie! To poprawna cyfra! ✓"
+        feedback = "Swietnie! To poprawna cyfra! \u2713"
     else:
-        feedback = f"Nie całkiem. Sprawdź jeszcze raz: {step['hint']}"
+        feedback = f"Nie calkiem. Sprawdz jeszcze raz: {step['hint']}"
 
     return {
         "correct": correct,
@@ -610,13 +644,12 @@ def validate_step(operation: str, step_id: int, task_data: dict, user_answer: in
 
 
 def validate_final_result(task_data: dict, user_answer: int) -> dict:
-    """Waliduje końcowy wynik zadania."""
     expected = task_data["result"]
     correct = user_answer == expected
     return {
         "correct": correct,
         "expected": expected,
-        "feedback": "Brawo! Wynik jest poprawny! 🎉" if correct else f"Wynik powinien być {expected}. Sprawdź obliczenia."
+        "feedback": "Brawo! Wynik jest poprawny! \uD83C\uDF89" if correct else f"Wynik powinien byc {expected}. Sprawdz obliczenia."
     }
 
 
@@ -625,20 +658,15 @@ def validate_final_result(task_data: dict, user_answer: int) -> dict:
 # ─────────────────────────────────────────────
 
 def _to_digits(n: int) -> list:
-    """Zamienia liczbę na listę cyfr [najstarsza, ..., najmłodsza]."""
+    """Zamienia liczbe na liste cyfr [najstarsza, ..., najmlodsza]."""
     return [int(d) for d in str(n)]
 
 
 # ─────────────────────────────────────────────
-# PUNKT WEJŚCIA (wywołanie przez Node.js)
+# PUNKT WEJSCIA (wywolanie przez Node.js)
 # ─────────────────────────────────────────────
 
 if __name__ == "__main__":
-    """
-    Node.js wywołuje ten skrypt przez child_process.spawn.
-    Wejście: JSON na stdin
-    Wyjście: JSON na stdout
-    """
     try:
         input_data = json.loads(sys.stdin.read())
         action = input_data.get("action")
@@ -649,7 +677,7 @@ if __name__ == "__main__":
                 max_digits1=input_data.get("max_digits1", 3),
                 max_digits2=input_data.get("max_digits2", 3)
             )
-            print(json.dumps({"success": True, "data": result}))
+            print(json.dumps({"success": True, "data": result}, ensure_ascii=False))
 
         elif action == "validate_step":
             result = validate_step(
@@ -658,17 +686,17 @@ if __name__ == "__main__":
                 task_data=input_data["task_data"],
                 user_answer=input_data["user_answer"]
             )
-            print(json.dumps({"success": True, "data": result}))
+            print(json.dumps({"success": True, "data": result}, ensure_ascii=False))
 
         elif action == "validate_final":
             result = validate_final_result(
                 task_data=input_data["task_data"],
                 user_answer=input_data["user_answer"]
             )
-            print(json.dumps({"success": True, "data": result}))
+            print(json.dumps({"success": True, "data": result}, ensure_ascii=False))
 
         else:
-            print(json.dumps({"success": False, "error": f"Nieznana akcja: {action}"}))
+            print(json.dumps({"success": False, "error": f"Unknown action: {action}"}))
 
     except Exception as e:
         print(json.dumps({"success": False, "error": str(e)}))

@@ -13,7 +13,9 @@
       "Bash(taskkill:*)",
       "Bash(npx vite:*)",
       "Bash(pkill:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(python3:*)",
+      "Bash(PYTHONUTF8=1 python3:*)"
     ]
   }
 }

@@ -112,20 +112,20 @@ export function TestPage() {
     <Layout>
       <div className="flex flex-col flex-1 w-full h-full">
 
-        <div className="flex items-center justify-between px-4 py-2 shrink-0">
-          <button onClick={() => navigate(-1)} className={`text-sm ${classes.text} opacity-70`}>
-            \u2190 Wr\u00f3\u0107
+        <div className="flex items-center justify-between px-6 py-3 shrink-0">
+          <button onClick={() => navigate(-1)} className={`text-base sm:text-lg font-bold ${classes.text} opacity-70 hover:opacity-100 flex items-center gap-1`}>
+            {'\u2190'} Wróć
           </button>
           <ProgressBar current={currentTaskIndex} total={COUNT} />
         </div>
 
         <div className="text-center py-2 shrink-0">
-          <p className={`text-lg font-bold ${classes.text}`}>\uD83D\uDCDD Test</p>
+          <p className={`text-2xl sm:text-3xl font-bold ${classes.text}`}>{'\uD83D\uDCDD'} Test</p>
         </div>
 
         <div className="flex flex-1 items-center justify-center p-4 overflow-auto">
           {loading ? (
-            <div className={`text-center ${classes.text} opacity-60`}>Przygotowuj\u0119 test...</div>
+            <div className={`text-center ${classes.text} opacity-60`}>Przygotowuję test...</div>
           ) : tasks[currentTaskIndex] ? (
             <AnimatePresence mode="wait">
               <motion.div key={currentTaskIndex} initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1, x: 0 }}>

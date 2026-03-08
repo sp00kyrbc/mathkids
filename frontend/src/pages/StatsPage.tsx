@@ -27,8 +27,8 @@ export function StatsPage() {
     <Layout>
       <div className="w-full max-w-3xl mx-auto">
         <div className="flex items-center justify-between mb-4">
-          <button onClick={() => navigate('/menu')} className={`text-sm ${classes.text} opacity-60`}>← Wróć</button>
-          <h2 className={`text-xl font-bold ${classes.text}`}>Moje wyniki</h2>
+          <button onClick={() => navigate('/menu')} className={`text-base sm:text-lg ${classes.text} opacity-60`}>← Wróć</button>
+          <h2 className={`text-2xl sm:text-3xl font-bold ${classes.text}`}>Moje wyniki</h2>
           <div className="w-10" />
         </div>
 
@@ -36,7 +36,7 @@ export function StatsPage() {
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className={`${classes.card} p-4 mb-4`}>
           <div className="flex justify-between items-center mb-2">
             <span className={`font-bold ${classes.text}`}>Poziom {level}</span>
-            <span className={`text-sm ${classes.text} opacity-60`}>{xp} PD</span>
+            <span className={`text-base sm:text-lg ${classes.text} opacity-60`}>{xp} PD</span>
           </div>
           <div className="w-full h-4 rounded-full bg-black/20 overflow-hidden">
             <motion.div
@@ -46,11 +46,11 @@ export function StatsPage() {
               transition={{ duration: 1, ease: 'easeOut' }}
             />
           </div>
-          <p className={`text-xs ${classes.text} opacity-50 mt-1`}>
+          <p className={`text-sm sm:text-base ${classes.text} opacity-50 mt-1`}>
             {xpForNext} PD do następnego poziomu
           </p>
           {streak > 0 && (
-            <p className="text-sm mt-2">🔥 Seria: <strong>{streak}</strong> {streak === 1 ? 'dzień' : streak < 5 ? 'dni' : 'dni'} z rzędu</p>
+            <p className="text-base sm:text-lg mt-2">🔥 Seria: <strong>{streak}</strong> {streak === 1 ? 'dzień' : streak < 5 ? 'dni' : 'dni'} z rzędu</p>
           )}
         </motion.div>
 
@@ -60,14 +60,14 @@ export function StatsPage() {
           <div className="space-y-2">
             {Object.entries(stats).map(([op, s]) => (
               <div key={op} className="flex items-center gap-3">
-                <span className={`text-sm w-28 ${classes.text} opacity-70`}>{opLabels[op]}</span>
+                <span className={`text-base sm:text-lg w-28 ${classes.text} opacity-70`}>{opLabels[op]}</span>
                 <div className="flex-1 h-3 rounded-full bg-black/20 overflow-hidden">
                   <div
                     className="h-full bg-green-400 rounded-full"
                     style={{ width: s.total > 0 ? `${(s.correct / s.total) * 100}%` : '0%' }}
                   />
                 </div>
-                <span className={`text-xs ${classes.text} opacity-60 w-16 text-right`}>
+                <span className={`text-sm sm:text-base ${classes.text} opacity-60 w-16 text-right`}>
                   {s.correct}/{s.total}
                 </span>
               </div>

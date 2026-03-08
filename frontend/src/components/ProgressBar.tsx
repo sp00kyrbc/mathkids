@@ -13,13 +13,18 @@ export function ProgressBar({ current, total, showText = true }: ProgressBarProp
   return (
     <div className="flex items-center gap-3">
       {showText && (
-        <span className={`text-sm font-bold ${classes.text}`}>
-          \u2713 {current}/{total}
+        <span className={`text-base sm:text-lg font-bold ${classes.text}`}>
+          {'\u2713'} {current}/{total}
         </span>
       )}
-      <div className={`w-32 sm:w-48 h-3 rounded-full overflow-hidden ${theme === 'chalk' ? 'bg-chalk-text/20' : 'bg-gray-200'}`}>
+      <div className={`
+        w-40 sm:w-56 h-4 sm:h-5 rounded-full overflow-hidden
+        ${theme === 'chalk' ? 'bg-white/20' : 'bg-gray-200'}
+      `}>
         <div
-          className={`h-full rounded-full transition-all duration-500 ${theme === 'chalk' ? 'bg-chalk-success' : 'bg-green-500'}`}
+          className={`h-full rounded-full transition-all duration-500
+            ${theme === 'chalk' ? 'bg-green-400' : 'bg-green-500'}
+          `}
           style={{ width: `${pct}%` }}
         />
       </div>

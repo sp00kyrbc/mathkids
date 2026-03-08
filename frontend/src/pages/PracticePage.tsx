@@ -83,16 +83,16 @@ export function PracticePage({ isTutorial = false }: PracticePageProps) {
       <div className="flex flex-col flex-1 w-full h-full">
 
         {/* Górny pasek: Wróć + postęp */}
-        <div className="flex items-center justify-between px-4 py-2 shrink-0">
-          <button onClick={() => navigate(-1)} className={`text-sm ${classes.text} opacity-70 hover:opacity-100`}>
-            \u2190 Wr\u00f3\u0107
+        <div className="flex items-center justify-between px-6 py-3 shrink-0">
+          <button onClick={() => navigate(-1)} className={`text-base sm:text-lg font-bold ${classes.text} opacity-70 hover:opacity-100 flex items-center gap-1`}>
+            {'\u2190'} Wróć
           </button>
           <ProgressBar current={tasksCompleted} total={tasksCompleted + 1} />
         </div>
 
         {/* Tytuł */}
         <div className="text-center py-2 shrink-0">
-          <p className={`text-lg font-bold ${classes.text}`}>
+          <p className={`text-2xl sm:text-3xl font-bold ${classes.text}`}>
             {isTutorial ? '\uD83E\uDDE1 Zr\u00f3bmy razem' : '\u270F\uFE0F Twoja kolej!'}
           </p>
         </div>
@@ -101,7 +101,7 @@ export function PracticePage({ isTutorial = false }: PracticePageProps) {
         <div className="flex flex-1 items-center justify-center p-4 overflow-auto">
           {loading ? (
             <div className={`text-center ${classes.text} opacity-60`}>
-              Przygotowuj\u0119 zadanie...
+              Przygotowuję zadanie...
             </div>
           ) : task ? (
             <ArithmeticDisplay
@@ -113,7 +113,7 @@ export function PracticePage({ isTutorial = false }: PracticePageProps) {
             />
           ) : (
             <div className={`text-center ${classes.text}`}>
-              Nie mo\u017Cna za\u0142adowa\u0107 zadania. <button onClick={fetchTask} className="underline">Spr\u00f3buj ponownie</button>
+              Nie można załadować zadania. <button onClick={fetchTask} className="underline">Spróbuj ponownie</button>
             </div>
           )}
         </div>

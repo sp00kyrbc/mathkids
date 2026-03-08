@@ -9,7 +9,7 @@ export interface TaskStep {
   carry_in: number;
   carry_out: number;
   borrow: boolean;
-  position: 'result' | 'carry' | 'partial' | 'remainder';
+  position: 'result' | 'carry' | 'partial' | 'remainder' | 'product';
   row: number | null;
   hint: string;
 }
@@ -41,11 +41,14 @@ export interface PartialResult {
 }
 
 export interface DivisionSubstep {
-  position: number;
+  position?: number;
   current_value: number;
   quotient_digit: number;
   product: number;
   remainder: number;
+  product_digits?: number;
+  indent?: number;
+  digits_taken?: string;
 }
 
 export interface Task {

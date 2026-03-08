@@ -73,7 +73,7 @@ export function TheoryPage() {
   return (
     <Layout>
       <div className="w-full max-w-2xl mx-auto">
-        <h2 className={`text-xl font-bold ${classes.text} mb-4 text-center`}>{theory.title}</h2>
+        <h2 className={`text-2xl sm:text-3xl font-bold ${classes.text} mb-4 text-center`}>{theory.title}</h2>
 
         {/* Wizualizacja */}
         <motion.div
@@ -96,7 +96,7 @@ export function TheoryPage() {
             exit={{ opacity: 0 }}
             className={`${classes.card} p-4 mb-6 text-center`}
           >
-            <p className={`${classes.text} text-base leading-relaxed`}>{currentStep.text}</p>
+            <p className={`${classes.text} text-lg sm:text-xl leading-relaxed`}>{currentStep.text}</p>
           </motion.div>
         </AnimatePresence>
 
@@ -116,12 +116,12 @@ export function TheoryPage() {
 
         <button
           onClick={next}
-          className={`w-full py-4 rounded-xl font-bold text-lg ${classes.button}`}
+          className={`w-full py-4 rounded-xl font-bold text-xl sm:text-2xl ${classes.button}`}
         >
           {isLast && isLastOp ? '🚀 Zacznijmy ćwiczyć!' : 'Dalej →'}
         </button>
 
-        <button onClick={() => navigate('/learn')} className={`mt-2 w-full py-2 text-sm ${classes.text} opacity-50`}>
+        <button onClick={() => navigate('/learn')} className={`mt-2 w-full py-2 text-base sm:text-lg ${classes.text} opacity-50`}>
           ← Wróć
         </button>
       </div>

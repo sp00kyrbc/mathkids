@@ -51,7 +51,7 @@ export function ProfilesPage() {
         <h1 className={`text-4xl font-bold ${classes.text} mb-2`}>
           🔢 {pl.app.name}
         </h1>
-        <p className={`text-lg ${classes.text} opacity-70`}>{pl.profiles.title}</p>
+        <p className={`text-xl sm:text-2xl ${classes.text} opacity-70`}>{pl.profiles.title}</p>
       </motion.div>
 
       {/* Lista profili */}
@@ -67,7 +67,7 @@ export function ProfilesPage() {
           >
             <span className="text-4xl">{profile.avatar}</span>
             <span className={`font-bold ${classes.text}`}>{profile.name}</span>
-            <span className={`text-xs ${classes.text} opacity-60`}>Poz. {profile.level}</span>
+            <span className={`text-sm sm:text-base ${classes.text} opacity-60`}>Poz. {profile.level}</span>
             <button
               onClick={(e) => { e.stopPropagation(); deleteProfile(profile.id); }}
               className="text-xs opacity-40 hover:opacity-70 mt-1"
@@ -117,17 +117,17 @@ export function ProfilesPage() {
               />
 
               <div className="mb-3">
-                <label className={`text-sm ${classes.text} opacity-70 mb-1 block`}>{pl.profiles.ageLabel}</label>
+                <label className={`text-base sm:text-lg ${classes.text} opacity-70 mb-1 block`}>{pl.profiles.ageLabel}</label>
                 <input
                   type="range" min={6} max={13} value={newAge}
                   onChange={e => setNewAge(Number(e.target.value))}
                   className="w-full"
                 />
-                <span className={`text-sm ${classes.text}`}>{newAge} lat</span>
+                <span className={`text-base sm:text-lg ${classes.text}`}>{newAge} lat</span>
               </div>
 
               <div className="mb-4">
-                <label className={`text-sm ${classes.text} opacity-70 mb-2 block`}>{pl.profiles.avatarLabel}</label>
+                <label className={`text-base sm:text-lg ${classes.text} opacity-70 mb-2 block`}>{pl.profiles.avatarLabel}</label>
                 <div className="grid grid-cols-6 gap-2">
                   {AVATARS.map(a => (
                     <button

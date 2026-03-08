@@ -46,7 +46,7 @@ export function MenuPage() {
         <motion.h2
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className={`text-2xl font-bold ${classes.text} mb-6 text-center`}
+          className={`text-2xl sm:text-3xl font-bold ${classes.text} mb-6 text-center`}
         >
           {greeting || `Cześć, ${activeProfile?.name}!`}
         </motion.h2>
@@ -63,7 +63,7 @@ export function MenuPage() {
               className={`bg-gradient-to-br ${item.color} rounded-2xl p-5 flex flex-col items-center gap-2 text-white shadow-lg hover:shadow-xl transition-shadow ${item.key === 'settings' ? 'col-span-2' : ''}`}
             >
               <span className="text-4xl">{item.emoji}</span>
-              <span className="font-bold text-lg">
+              <span className="font-bold text-xl sm:text-2xl">
                 {pl.menu[item.key as keyof typeof pl.menu]}
               </span>
             </motion.button>
@@ -72,7 +72,7 @@ export function MenuPage() {
 
         <button
           onClick={() => { clearActiveProfile(); navigate('/'); }}
-          className={`mt-6 w-full py-2 text-sm ${classes.text} opacity-50 hover:opacity-80`}
+          className={`mt-6 w-full py-2 text-base sm:text-lg ${classes.text} opacity-50 hover:opacity-80`}
         >
           ← Zmień profil
         </button>

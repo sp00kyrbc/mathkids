@@ -53,7 +53,7 @@ export function LearnPage() {
         <motion.h2
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className={`text-2xl font-bold ${classes.text} mb-4 text-center`}
+          className={`text-2xl sm:text-3xl font-bold ${classes.text} mb-4 text-center`}
         >
           Co chcesz ćwiczyć?
         </motion.h2>
@@ -87,7 +87,7 @@ export function LearnPage() {
           <h3 className={`font-bold ${classes.text} mb-3`}>Trudność</h3>
           <div className="space-y-3">
             <div>
-              <label className={`text-sm ${classes.text} opacity-70`}>
+              <label className={`text-base sm:text-lg ${classes.text} opacity-70`}>
                 Pierwsza liczba: max {maxDigits1} {maxDigits1 === 1 ? 'cyfra' : maxDigits1 < 5 ? 'cyfry' : 'cyfr'}
               </label>
               <input
@@ -100,7 +100,7 @@ export function LearnPage() {
               </div>
             </div>
             <div>
-              <label className={`text-sm ${classes.text} opacity-70`}>
+              <label className={`text-base sm:text-lg ${classes.text} opacity-70`}>
                 Druga liczba: max {maxDigits2} {maxDigits2 === 1 ? 'cyfra' : maxDigits2 < 5 ? 'cyfry' : 'cyfr'}
               </label>
               <input
@@ -129,14 +129,14 @@ export function LearnPage() {
                 <p className={`font-bold ${classes.text}`}>
                   {pl.modes[mode.key as keyof typeof pl.modes].title}
                 </p>
-                <p className={`text-sm ${classes.text} opacity-60`}>{mode.description}</p>
+                <p className={`text-base sm:text-lg ${classes.text} opacity-60`}>{mode.description}</p>
               </div>
               <span className={`ml-auto ${classes.text} opacity-40`}>→</span>
             </motion.button>
           ))}
         </div>
 
-        <button onClick={() => navigate('/menu')} className={`mt-4 w-full py-2 text-sm ${classes.text} opacity-50`}>
+        <button onClick={() => navigate('/menu')} className={`mt-4 w-full py-2 text-base sm:text-lg ${classes.text} opacity-50`}>
           ← Wróć
         </button>
       </div>

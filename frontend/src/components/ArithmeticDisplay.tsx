@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import type { Task } from '../types/task';
 import { useTheme } from '../hooks/useTheme';
 import { DivisionDisplay } from './DivisionDisplay';
+import { operationSymbol } from '../utils/symbols';
 
 const API = import.meta.env.VITE_API_URL;
 
@@ -319,8 +320,8 @@ export function ArithmeticDisplay({ task, mode, onStepComplete, onTaskComplete, 
   }, [handleDigit]);
 
   // ── Style ──────────────────────────────────────────────────────────────
-  const CELL_SIZE = 'w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20';
-  const FONT_SIZE = 'text-2xl sm:text-3xl lg:text-4xl';
+  const CELL_SIZE = 'w-14 h-14 sm:w-16 sm:h-16 lg:w-20 lg:h-20';
+  const FONT_SIZE = 'text-3xl sm:text-4xl lg:text-5xl';
   const DIGIT_CLS = `${CELL_SIZE} flex items-center justify-center ${FONT_SIZE} font-bold rounded
     ${classes.font}
     ${theme === 'chalk'
@@ -401,13 +402,7 @@ export function ArithmeticDisplay({ task, mode, onStepComplete, onTaskComplete, 
     return queue.find(c => c.type === 'carry' && c.row === 0 && c.col === col);
   }
 
-  const SYMBOL: Record<string, string> = {
-    addition: '+',
-    subtraction: '\u2212',
-    multiplication: '\u00D7',
-    division: '\u00F7',
-  };
-  const symbol = SYMBOL[task.operation] || '+';
+  const symbol = operationSymbol(task.operation);
   const currentStepData = task.steps.find(s => s.step_id === activeCell?.stepId);
 
   // ── JSX ────────────────────────────────────────────────────────────────
@@ -518,7 +513,7 @@ export function ArithmeticDisplay({ task, mode, onStepComplete, onTaskComplete, 
                         <div
                           key={col}
                           className={`${CELL_SIZE} flex items-center justify-center cursor-pointer rounded opacity-0 hover:opacity-30 transition-opacity`}
-                          title="Kliknij \u017Ceby zapisa\u0107 przeniesienie"
+                          title="Kliknij żeby zapisać przeniesienie"
                           onClick={() => {
                             setUnlockedCarries(prev => new Set(prev).add(carryCell.id));
                           }}

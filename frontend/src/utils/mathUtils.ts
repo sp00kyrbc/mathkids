@@ -1,15 +1,9 @@
 /**
- * Narzędzia matematyczne — bez znaków specjalnych wpisanych literalnie.
- * Wszystkie znaki specjalne jako Unicode escape.
+ * Narzędzia matematyczne.
  */
 
-// Znaki operacji — TYLKO Unicode, nigdy literalne znaki
-export const SYMBOLS = {
-  addition:       '+',
-  subtraction:    '\u2212',   // −
-  multiplication: '\u00D7',   // ×
-  division:       '\u00F7',   // ÷
-} as const;
+// Znaki operacji — re-eksport z centralnego pliku symbols.ts
+export { operationSymbol } from './symbols';
 
 /**
  * Rozdziela liczbę na cyfry, wyrównując do zadanej długości zerami z lewej.
