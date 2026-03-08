@@ -23,7 +23,11 @@ mathkids/
 │   ├── 07-gamification.md
 │   ├── 08-gemini-setup.md
 │   ├── 09-bugfix-grid.md
-│   └── 10-bugfix-grid-final.md
+│   ├── 10-bugfix-grid-final.md
+│   ├── 11-bugfix-layout-carry.md
+│   ├── 12-fix-multiplication.md
+│   ├── 13-fix-division.md
+│   └── 14-fix-multiplication-rewrite.md
 ├── backend/                    ← Node.js + Express (TypeScript)
 │   ├── src/
 │   │   ├── index.ts
@@ -268,5 +272,15 @@ API dostępne na: http://localhost:3001
 8. `docs/08-gemini-setup.md` — Konfiguracja Gemini + integracja
 9. `docs/09-bugfix-grid.md` — Naprawa siatki dla wszystkich działań
 10. `docs/10-bugfix-grid-final.md` — Kompletna naprawa siatki (przepisanie od zera)
+11. `docs/11-bugfix-layout-carry.md` — Pełny ekran + wiersz przeniesień (carry)
+12. `docs/12-fix-multiplication.md` — Poprawne mnożenie pisemne + enkodowanie symboli
+13. `docs/13-fix-division.md` — Poprawne dzielenie pisemne + osobny komponent DivisionDisplay
+14. `docs/14-fix-multiplication-rewrite.md` — Przepisanie ArithmeticDisplay od zera (prostsza architektura)
+15. `docs/15-layouts-final.md` — Prawidłowe układy mnożenia (polska szkoła) i dzielenia (iloraz nad dzielną)
+16. `docs/16-polska-metoda-wszystkie-dzialania.md` — Polska metoda szkolna: edytowalne przeniesienia (carry), carry per partial row w mnożeniu
+17. `docs/17-kratki-zeszyt.md` — Każda cyfra w kratce z ramką jak w zeszycie, spójne style
+18. `docs/18-pelny-ekran-ui.md` — Pełny ekran, ThemeSwitcher w headerze, ProgressBar, responsywne kratki
+19. `docs/19-kolejnosc-wpisywania.md` — Kolejność wpisywania: cyfra → przeniesienie → następna kolumna
+20. `docs/20-przeniesienia-ukryte.md` — Przeniesienia ukryte do momentu aktywacji, szerokość = szerokość cyfry
 
 **WAŻNE**: Przeczytaj CLAUDE.md przed każdym plikiem. Każdy plik docs/ buduje na poprzednim — nie pomijaj kolejności.

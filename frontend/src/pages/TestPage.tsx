@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Layout } from '../components/Layout';
 import { ArithmeticDisplay } from '../components/ArithmeticDisplay';
+import { ProgressBar } from '../components/ProgressBar';
 import { useTheme } from '../hooks/useTheme';
 import { useAppStore } from '../store/useAppStore';
 import type { Task } from '../types/task';
@@ -56,7 +57,6 @@ export function TestPage() {
     setResults(newResults);
 
     if (newResults.length === tasks.length) {
-      // Test zakończony
       const correctCount = newResults.filter(Boolean).length;
       const gradeRes = await fetch(`${API}/api/validate/test-score`, {
         method: 'POST',
@@ -66,12 +66,10 @@ export function TestPage() {
       const grade = await gradeRes.json();
       setGradeData(grade);
 
-      // XP za test
       if (activeProfile) {
         const xp = 50 + grade.grade * 10;
         addXP(activeProfile.id, xp);
 
-        // Komunikat AI
         try {
           const aiRes = await fetch(`${API}/api/ai/message`, {
             method: 'POST',
@@ -112,38 +110,37 @@ export function TestPage() {
 
   return (
     <Layout>
-      <div className="w-full max-w-2xl mx-auto">
-        {/* Postęp */}
-        <div className="flex items-center justify-between mb-4">
-          <span className={`text-sm ${classes.text} opacity-60`}>
-            Zadanie {currentTaskIndex + 1} / {COUNT}
-          </span>
-          <div className="flex gap-1">
-            {Array(COUNT).fill(null).map((_, i) => (
-              <div key={i} className={`w-6 h-2 rounded-full transition-all ${
-                i < results.length
-                  ? results[i] ? 'bg-green-400' : 'bg-red-400'
-                  : i === currentTaskIndex ? 'bg-yellow-400' : 'bg-gray-400/30'
-              }`} />
-            ))}
-          </div>
+      <div className="flex flex-col flex-1 w-full h-full">
+
+        <div className="flex items-center justify-between px-4 py-2 shrink-0">
+          <button onClick={() => navigate(-1)} className={`text-sm ${classes.text} opacity-70`}>
+            \u2190 Wr\u00f3\u0107
+          </button>
+          <ProgressBar current={currentTaskIndex} total={COUNT} />
         </div>
 
-        {loading ? (
-          <div className={`text-center ${classes.text} py-20 opacity-60`}>Przygotowuję test...</div>
-        ) : tasks[currentTaskIndex] ? (
-          <AnimatePresence mode="wait">
-            <motion.div key={currentTaskIndex} initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1, x: 0 }}>
-              <ArithmeticDisplay
-                task={tasks[currentTaskIndex]}
-                mode="test"
-                onStepComplete={() => {}}
-                onTaskComplete={handleTaskComplete}
-                feedbackMode="after"
-              />
-            </motion.div>
-          </AnimatePresence>
-        ) : null}
+        <div className="text-center py-2 shrink-0">
+          <p className={`text-lg font-bold ${classes.text}`}>\uD83D\uDCDD Test</p>
+        </div>
+
+        <div className="flex flex-1 items-center justify-center p-4 overflow-auto">
+          {loading ? (
+            <div className={`text-center ${classes.text} opacity-60`}>Przygotowuj\u0119 test...</div>
+          ) : tasks[currentTaskIndex] ? (
+            <AnimatePresence mode="wait">
+              <motion.div key={currentTaskIndex} initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1, x: 0 }}>
+                <ArithmeticDisplay
+                  task={tasks[currentTaskIndex]}
+                  mode="test"
+                  onStepComplete={() => {}}
+                  onTaskComplete={handleTaskComplete}
+                  feedbackMode="after"
+                />
+              </motion.div>
+            </AnimatePresence>
+          ) : null}
+        </div>
+
       </div>
     </Layout>
   );

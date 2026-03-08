@@ -25,7 +25,7 @@ export function GradeDisplay({ grade, aiMessage, onRetry, onMenu }: GradeDisplay
   const { classes } = useTheme();
 
   return (
-    <div className="max-w-md mx-auto text-center">
+    <div className="w-full max-w-3xl mx-auto text-center">
       <motion.div
         initial={{ scale: 0, rotate: -10 }}
         animate={{ scale: 1, rotate: 0 }}

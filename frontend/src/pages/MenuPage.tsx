@@ -42,7 +42,7 @@ export function MenuPage() {
 
   return (
     <Layout>
-      <div className="max-w-md mx-auto">
+      <div className="w-full max-w-3xl mx-auto">
         <motion.h2
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}

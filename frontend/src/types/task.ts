@@ -34,11 +34,10 @@ export interface TaskLayout {
 }
 
 export interface PartialResult {
-  multiplier_digit: number;
-  multiplier_position: number;
-  shift: number;
   value: number;
-  display: string;
+  shift: number;
+  digit_used: number;
+  carries?: Record<number, number>;
 }
 
 export interface DivisionSubstep {

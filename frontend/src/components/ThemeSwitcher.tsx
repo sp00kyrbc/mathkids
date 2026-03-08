@@ -1,20 +1,26 @@
-import { motion } from 'framer-motion';
 import { useAppStore } from '../store/useAppStore';
 import { useTheme } from '../hooks/useTheme';
 
 export function ThemeSwitcher() {
   const setTheme = useAppStore(s => s.setTheme);
-  const { theme, classes } = useTheme();
+  const { theme } = useTheme();
 
   return (
-    <motion.button
+    <button
       onClick={() => setTheme(theme === 'chalk' ? 'notebook' : 'chalk')}
-      className={`fixed top-4 right-4 z-50 p-2 rounded-full text-2xl ${classes.card} cursor-pointer`}
-      whileTap={{ scale: 0.9 }}
-      whileHover={{ scale: 1.1 }}
-      title={theme === 'chalk' ? 'Przełącz na zeszyt' : 'Przełącz na tablicę'}
+      title={theme === 'chalk' ? 'Prze\u0142\u0105cz na zeszyt' : 'Prze\u0142\u0105cz na tablic\u0119'}
+      className={`
+        flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-bold
+        transition-all active:scale-95
+        ${theme === 'chalk'
+          ? 'bg-chalk-text/20 text-chalk-text hover:bg-chalk-text/30'
+          : 'bg-notebook-text/10 text-notebook-text hover:bg-notebook-text/20'}
+      `}
     >
-      {theme === 'chalk' ? '📓' : '🖊️'}
-    </motion.button>
+      <span>{theme === 'chalk' ? '\uD83D\uDCD3' : '\uD83D\uDD8A\uFE0F'}</span>
+      <span className="hidden sm:inline">
+        {theme === 'chalk' ? 'Zeszyt' : 'Tablica'}
+      </span>
+    </button>
   );
 }

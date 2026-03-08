@@ -103,7 +103,7 @@ export function ProfilesPage() {
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.8, opacity: 0 }}
-              className={`${classes.card} p-6 w-full max-w-sm`}
+              className={`${classes.card} p-6 w-full max-w-xl`}
             >
               <h2 className={`text-2xl font-bold ${classes.text} mb-4`}>{pl.profiles.createProfile}</h2>
 

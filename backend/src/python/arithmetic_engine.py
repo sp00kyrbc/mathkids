@@ -211,8 +211,8 @@ def _generate_subtraction(max_digits1: int, max_digits2: int) -> dict:
         "steps": [asdict(s) for s in steps],
         "layout": layout,
         "difficulty": max_digits1,
-        "symbol": "−",
-        "question": f"{a} − {b} = ?"
+        "symbol": "\u2212",
+        "question": f"{a} \u2212 {b} = ?"
     }
 
 
@@ -258,11 +258,11 @@ def _compute_subtraction_steps(a: int, b: int) -> list:
         result_digit = d_a - d_b
 
         if borrowed:
-            desc = f"Odejmuję cyfry {pos_name}: {d_a - 10} jest za małe, pożyczam 10. {d_a} − {d_b} = {result_digit}."
-            hint = f"{d_a - 10} jest mniejsze niż {d_b}. Pożycz 10 z sąsiedniej kolumny i oblicz {d_a} − {d_b}."
+            desc = f"Odejmuj\u0119 cyfry {pos_name}: {d_a - 10} jest za ma\u0142e, po\u017Cyczam 10. {d_a} \u2212 {d_b} = {result_digit}."
+            hint = f"{d_a - 10} jest mniejsze ni\u017C {d_b}. Po\u017Cycz 10 z s\u0105siedniej kolumny i oblicz {d_a} \u2212 {d_b}."
         else:
-            desc = f"Odejmuję cyfry {pos_name}: {d_a} − {d_b} = {result_digit}."
-            hint = f"Ile to {d_a} − {d_b}?"
+            desc = f"Odejmuj\u0119 cyfry {pos_name}: {d_a} \u2212 {d_b} = {result_digit}."
+            hint = f"Ile to {d_a} \u2212 {d_b}?"
 
         step = Step(
             step_id=step_id,
@@ -292,7 +292,7 @@ def _generate_multiplication(max_digits1: int, max_digits2: int) -> dict:
     max_digits2 = min(max_digits2, 2)
     a = _random_number(max_digits1)
     b = _random_number(max_digits2)
-    if b == 1:
+    if b < 10:
         b = random.randint(2, 9)
     result = a * b
     steps, partials = _compute_multiplication_steps(a, b)
@@ -308,102 +308,94 @@ def _generate_multiplication(max_digits1: int, max_digits2: int) -> dict:
         "partials": partials,
         "layout": layout,
         "difficulty": max_digits1,
-        "symbol": "×",
-        "question": f"{a} × {b} = ?"
+        "symbol": "\u00D7",
+        "question": f"{a} \u00D7 {b} = ?"
     }
 
 
 def _compute_multiplication_steps(a: int, b: int) -> tuple:
-    """Oblicza kroki mnożenia pod kreską."""
-    digits_a = _to_digits(a)
-    digits_b = _to_digits(b)
+    """Oblicza kroki mnożenia pod kreską (polska szkoła)."""
+    b_str = str(b)
+    b_digits = [int(c) for c in reversed(b_str)]  # jedności pierwsze
+    a_str = str(a)
+    a_digits_rev = [int(c) for c in reversed(a_str)]
 
-    steps = []
+    partials = []
+    all_steps = []
     step_id = 0
-    partials = []  # wyniki cząstkowe
-    position_names = ["jedności", "dziesiątek", "setek", "tysięcy"]
 
-    for b_col in range(len(digits_b) - 1, -1, -1):
-        b_digit = digits_b[b_col]
-        b_col_index = len(digits_b) - 1 - b_col  # 0 = jedności
-        shift = b_col_index
+    for shift, digit_b in enumerate(b_digits):
+        partial_value = a * digit_b
 
-        partial_result = a * b_digit * (10 ** shift)
+        # Oblicz przeniesienia wiersza cząstkowego
+        carry = 0
+        carries_for_row = {}
+        for col, digit_a in enumerate(a_digits_rev):
+            product = digit_a * digit_b + carry
+            carry = product // 10
+            if carry > 0:
+                carries_for_row[col + 1] = carry
+
         partials.append({
-            "multiplier_digit": b_digit,
-            "multiplier_position": b_col_index,
+            "value": partial_value,
             "shift": shift,
-            "value": partial_result,
-            "display": str(a * b_digit) + "0" * shift
+            "digit_used": digit_b,
+            "carries": carries_for_row,
         })
 
-        pos_name = position_names[min(b_col_index, len(position_names) - 1)]
-        carry = 0
-
-        for a_col in range(len(digits_a) - 1, -1, -1):
-            a_digit = digits_a[a_col]
-            a_col_index = len(digits_a) - 1 - a_col
-
-            product = a_digit * b_digit + carry
-            result_digit = product % 10
-            carry = product // 10
-
-            desc = f"Mnożę {a_digit} × {b_digit}"
-            if carry > 0:
-                desc += f" + {carry - (product - result_digit) // 10} (przeniesienie)"
-            desc += f" = {product}. Zapisuję {result_digit}."
-
-            step = Step(
+        # Kroki przeniesień (carry) — dziecko je wpisuje
+        for col_fr, carry_val in sorted(carries_for_row.items()):
+            all_steps.append(Step(
                 step_id=step_id,
-                description=desc,
-                column=a_col_index + shift,
-                input_digits=[a_digit, b_digit],
-                result_digit=result_digit,
-                carry_in=carry - product // 10 if carry > 0 else 0,
-                carry_out=carry,
+                position="carry",
+                row=shift,
+                column=col_fr,
+                result_digit=carry_val,
+                description=f"Przenosz\u0119 {carry_val} do nast\u0119pnej kolumny (wiersz {shift+1}).",
+                hint="Ile przenosz\u0119?",
+                carry_in=0,
+                carry_out=carry_val,
                 borrow=False,
-                position="partial",
-                row=b_col_index,
-                hint=f"Ile to {a_digit} × {b_digit}?"
-            )
-            steps.append(step)
+                input_digits=[digit_b],
+            ))
             step_id += 1
 
-        if carry > 0:
-            step = Step(
+        # Kroki cyfr wyniku cząstkowego (od prawej)
+        for col, d in enumerate(reversed(str(partial_value))):
+            all_steps.append(Step(
                 step_id=step_id,
-                description=f"Ostatnie przeniesienie: {carry}",
-                column=len(digits_a) + shift,
-                input_digits=[],
-                result_digit=carry,
+                position="partial",
+                row=shift,
+                column=col,
+                result_digit=int(d),
+                description=f"Mno\u017C\u0119: {a_str[-(col+1)] if col < len(a_str) else 0} \u00D7 {digit_b}. Cyfra: {d}.",
+                hint=f"Ile to {digit_b} \u00D7 ... ?",
                 carry_in=0,
                 carry_out=0,
                 borrow=False,
-                position="partial",
-                row=b_col_index,
-                hint=f"Zapisz pozostałe przeniesienie {carry}."
-            )
-            steps.append(step)
+                input_digits=[digit_b],
+            ))
             step_id += 1
 
-    # Dodawanie wyników cząstkowych (jeśli mnożnik dwucyfrowy)
-    if len(digits_b) > 1:
-        step = Step(
+    # Wynik końcowy
+    result = a * b
+    for col, d in enumerate(reversed(str(result))):
+        all_steps.append(Step(
             step_id=step_id,
-            description=f"Teraz dodaję wyniki cząstkowe: {' + '.join(str(p['value']) for p in partials)} = {a*b}",
-            column=0,
-            input_digits=[p['value'] for p in partials],
-            result_digit=0,
+            position="result",
+            row=None,
+            column=col,
+            result_digit=int(d),
+            description=f"Dodaj wyniki cz\u0105stkowe. Cyfra wyniku: {d}.",
+            hint="Dodaj kolumn\u0119 pionowo.",
             carry_in=0,
             carry_out=0,
             borrow=False,
-            position="result",
-            row=None,
-            hint="Dodaj wyniki cząstkowe pod kreską."
-        )
-        steps.append(step)
+            input_digits=[],
+        ))
+        step_id += 1
 
-    return steps, partials
+    return all_steps, partials
 
 
 # ─────────────────────────────────────────────
@@ -435,8 +427,8 @@ def _generate_division(max_digits1: int, max_digits2: int) -> dict:
         "division_steps": substeps,
         "layout": layout,
         "difficulty": len(str(dividend)),
-        "symbol": "÷",
-        "question": f"{dividend} ÷ {divisor} = ?"
+        "symbol": "\u00F7",
+        "question": f"{dividend} \u00F7 {divisor} = ?"
     }
 
 
@@ -458,8 +450,8 @@ def _compute_division_steps(dividend: int, divisor: int) -> tuple:
 
         quotient_digits.append(q_digit)
 
-        desc = f"Biorę {current}. {current} ÷ {divisor} = {q_digit} (bo {q_digit} × {divisor} = {product}). Reszta: {remainder}."
-        hint = f"Ile razy {divisor} mieści się w {current}?"
+        desc = f"Bior\u0119 {current}. {current} \u00F7 {divisor} = {q_digit} (bo {q_digit} \u00D7 {divisor} = {product}). Reszta: {remainder}."
+        hint = f"Ile razy {divisor} mie\u015Bci si\u0119 w {current}?"
 
         substep = {
             "position": i,
@@ -550,7 +542,7 @@ def _build_subtraction_layout(a: int, b: int, result: int, steps: list) -> dict:
         "operand2": b_str.zfill(max_len),
         "result": r_str.zfill(max_len),
         "borrows": borrows,
-        "symbol": "−",
+        "symbol": "\u2212",
         "max_len": max_len
     }
 
@@ -560,7 +552,7 @@ def _build_multiplication_layout(a: int, b: int, result: int, partials: list) ->
     b_str = str(b)
     r_str = str(result)
     max_len = max(len(a_str), len(b_str), len(r_str),
-                  max(len(str(p['value'])) for p in partials) if partials else 0)
+                  max(len(str(p['value'])) + p['shift'] for p in partials) if partials else 0)
 
     return {
         "type": "multiplication",
@@ -568,7 +560,7 @@ def _build_multiplication_layout(a: int, b: int, result: int, partials: list) ->
         "operand2": b_str.zfill(max_len),
         "result": r_str.zfill(max_len),
         "partials": partials,
-        "symbol": "×",
+        "symbol": "\u00D7",
         "max_len": max_len
     }
 
@@ -581,7 +573,7 @@ def _build_division_layout(dividend: int, divisor: int, quotient: int, remainder
         "quotient": str(quotient),
         "remainder": remainder,
         "substeps": substeps,
-        "symbol": "÷"
+        "symbol": "\u00F7"
     }
 
 

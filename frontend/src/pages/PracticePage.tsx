@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence } from 'framer-motion';
 import { Layout } from '../components/Layout';
 import { ArithmeticDisplay } from '../components/ArithmeticDisplay';
+import { ProgressBar } from '../components/ProgressBar';
 import { XPPopup } from '../components/XPPopup';
 import { useTheme } from '../hooks/useTheme';
 import { useAppStore } from '../store/useAppStore';
@@ -45,7 +46,7 @@ export function PracticePage({ isTutorial = false }: PracticePageProps) {
       const data = await res.json();
       setTask(data);
     } catch (e) {
-      console.error('Błąd pobierania zadania:', e);
+      console.error('B\u0142\u0105d pobierania zadania:', e);
     } finally {
       setLoading(false);
     }
@@ -63,10 +64,9 @@ export function PracticePage({ isTutorial = false }: PracticePageProps) {
     const newStreak = correct ? streak + 1 : 0;
     setStreak(newStreak);
 
-    // XP: 10 base, +5 jeśli poprawna za pierwszym razem, bonus za serię
     let xp = correct ? 10 : 0;
-    if (taskCorrect) xp += 5;  // bezbłędne
-    if (newStreak > 1) xp += Math.min(newStreak - 1, 5);  // seria max +5
+    if (taskCorrect) xp += 5;
+    if (newStreak > 1) xp += Math.min(newStreak - 1, 5);
 
     if (xp > 0) {
       addXP(activeProfile.id, xp);
@@ -80,46 +80,43 @@ export function PracticePage({ isTutorial = false }: PracticePageProps) {
 
   return (
     <Layout>
-      <div className="w-full max-w-2xl mx-auto">
-        <div className="flex items-center justify-between mb-4">
-          <button onClick={() => navigate('/learn')} className={`text-sm ${classes.text} opacity-60`}>← Wróć</button>
-          <div className="flex gap-3">
-            <span className={`text-sm ${classes.text} opacity-60`}>
-              ✓ {tasksCompleted} zadań
-            </span>
-            {streak > 1 && (
-              <motion.span
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                className="text-sm font-bold text-orange-400"
-              >
-                🔥 {streak}
-              </motion.span>
-            )}
-          </div>
+      <div className="flex flex-col flex-1 w-full h-full">
+
+        {/* Górny pasek: Wróć + postęp */}
+        <div className="flex items-center justify-between px-4 py-2 shrink-0">
+          <button onClick={() => navigate(-1)} className={`text-sm ${classes.text} opacity-70 hover:opacity-100`}>
+            \u2190 Wr\u00f3\u0107
+          </button>
+          <ProgressBar current={tasksCompleted} total={tasksCompleted + 1} />
         </div>
 
-        <h2 className={`text-xl font-bold ${classes.text} mb-4 text-center`}>
-          {isTutorial ? '🤝 Zróbmy razem' : '✏️ Twoja kolej!'}
-        </h2>
+        {/* Tytuł */}
+        <div className="text-center py-2 shrink-0">
+          <p className={`text-lg font-bold ${classes.text}`}>
+            {isTutorial ? '\uD83E\uDDE1 Zr\u00f3bmy razem' : '\u270F\uFE0F Twoja kolej!'}
+          </p>
+        </div>
 
-        {loading ? (
-          <div className={`text-center ${classes.text} py-20 opacity-60`}>
-            Przygotowuję zadanie...
-          </div>
-        ) : task ? (
-          <ArithmeticDisplay
-            task={task}
-            mode={isTutorial ? 'tutorial' : 'practice'}
-            onStepComplete={handleStepComplete}
-            onTaskComplete={handleTaskComplete}
-            feedbackMode={activeProfile?.feedbackMode || 'immediate'}
-          />
-        ) : (
-          <div className={`text-center ${classes.text} py-20`}>
-            Nie można załadować zadania. <button onClick={fetchTask} className="underline">Spróbuj ponownie</button>
-          </div>
-        )}
+        {/* SIATKA — rośnie żeby wypełnić resztę ekranu */}
+        <div className="flex flex-1 items-center justify-center p-4 overflow-auto">
+          {loading ? (
+            <div className={`text-center ${classes.text} opacity-60`}>
+              Przygotowuj\u0119 zadanie...
+            </div>
+          ) : task ? (
+            <ArithmeticDisplay
+              task={task}
+              mode={isTutorial ? 'tutorial' : 'practice'}
+              onStepComplete={handleStepComplete}
+              onTaskComplete={handleTaskComplete}
+              feedbackMode={activeProfile?.feedbackMode || 'immediate'}
+            />
+          ) : (
+            <div className={`text-center ${classes.text}`}>
+              Nie mo\u017Cna za\u0142adowa\u0107 zadania. <button onClick={fetchTask} className="underline">Spr\u00f3buj ponownie</button>
+            </div>
+          )}
+        </div>
 
         {/* XP Popup */}
         <AnimatePresence>

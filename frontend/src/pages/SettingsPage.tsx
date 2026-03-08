@@ -15,7 +15,7 @@ export function SettingsPage() {
 
   return (
     <Layout>
-      <div className="max-w-md mx-auto">
+      <div className="w-full max-w-3xl mx-auto">
         <div className="flex items-center gap-4 mb-6">
           <button onClick={() => navigate('/menu')} className={`text-sm ${classes.text} opacity-60`}>← Wróć</button>
           <h2 className={`text-xl font-bold ${classes.text}`}>{pl.settings.title}</h2>

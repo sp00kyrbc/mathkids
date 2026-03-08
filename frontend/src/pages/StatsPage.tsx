@@ -25,7 +25,7 @@ export function StatsPage() {
 
   return (
     <Layout>
-      <div className="max-w-md mx-auto">
+      <div className="w-full max-w-3xl mx-auto">
         <div className="flex items-center justify-between mb-4">
           <button onClick={() => navigate('/menu')} className={`text-sm ${classes.text} opacity-60`}>← Wróć</button>
           <h2 className={`text-xl font-bold ${classes.text}`}>Moje wyniki</h2>
