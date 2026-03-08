@@ -10,7 +10,8 @@
       "Bash(PYTHONIOENCODING=utf-8 python:*)",
       "Bash(npx tsc:*)",
       "Bash(curl:*)",
-      "Bash(taskkill:*)"
+      "Bash(taskkill:*)",
+      "Bash(npx vite:*)"
     ]
   }
 }
