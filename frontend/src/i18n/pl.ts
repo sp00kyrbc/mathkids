@@ -1,0 +1,96 @@
+export const pl = {
+  app: {
+    name: 'Matematyka Pod Kreską',
+    tagline: 'Nauka działań pisemnych',
+  },
+  profiles: {
+    title: 'Kto to ja?',
+    subtitle: 'Wybierz swój profil lub utwórz nowy',
+    newProfile: 'Nowy profil',
+    createProfile: 'Stwórz profil',
+    editProfile: 'Edytuj profil',
+    deleteProfile: 'Usuń profil',
+    nameLabel: 'Twoje imię',
+    namePlaceholder: 'Wpisz swoje imię',
+    ageLabel: 'Ile masz lat?',
+    avatarLabel: 'Wybierz awatar',
+    save: 'Zapisz',
+    cancel: 'Anuluj',
+    deleteConfirm: 'Na pewno chcesz usunąć profil?',
+  },
+  menu: {
+    learn: 'Uczę się',
+    practice: 'Ćwiczę',
+    test: 'Test',
+    stats: 'Moje wyniki',
+    settings: 'Ustawienia',
+  },
+  operations: {
+    addition: 'Dodawanie',
+    subtraction: 'Odejmowanie',
+    multiplication: 'Mnożenie',
+    division: 'Dzielenie',
+  },
+  modes: {
+    theory: {
+      title: 'Jak to działa?',
+      subtitle: 'Obejrzyj i zrozum',
+      button: 'Zacznij oglądać',
+    },
+    tutorial: {
+      title: 'Zróbmy razem',
+      subtitle: 'Krok po kroku z pomocą',
+      button: 'Zacznij tutorial',
+    },
+    practice: {
+      title: 'Twoja kolej!',
+      subtitle: 'Ćwicz samodzielnie',
+      button: 'Zacznij ćwiczyć',
+    },
+    test: {
+      title: 'Sprawdź się',
+      subtitle: 'Pokaż co umiesz',
+      button: 'Zacznij test',
+    },
+  },
+  feedback: {
+    correct: 'Brawo! To dobra odpowiedź! ✓',
+    incorrect: 'Nie całkiem... Spróbuj jeszcze raz!',
+    hint: 'Wskazówka',
+    showSolution: 'Pokaż rozwiązanie',
+    nextStep: 'Następny krok',
+    nextTask: 'Następne zadanie',
+    finish: 'Zakończ',
+  },
+  gamification: {
+    xp: 'PD',  // Punkty Doświadczenia
+    level: 'Poziom',
+    streak: 'Seria dni',
+    badges: 'Odznaki',
+    newBadge: 'Nowa odznaka!',
+    levelUp: 'Poziom wyżej!',
+  },
+  settings: {
+    title: 'Ustawienia',
+    theme: 'Motyw',
+    themeChalk: 'Tablica',
+    themeNotebook: 'Zeszyt',
+    feedbackMode: 'Tryb podpowiedzi',
+    feedbackImmediate: 'Pokazuj błędy od razu',
+    feedbackAfter: 'Pokaż po zadaniu',
+    digits1: 'Cyfry pierwszej liczby',
+    digits2: 'Cyfry drugiej liczby',
+    sound: 'Dźwięki',
+  },
+  grades: {
+    label: 'Ocena',
+    6: 'Celujący',
+    5: 'Bardzo dobry',
+    4: 'Dobry',
+    3: 'Dostateczny',
+    2: 'Dopuszczający',
+    1: 'Niedostateczny',
+  },
+};
+
+export type Translations = typeof pl;

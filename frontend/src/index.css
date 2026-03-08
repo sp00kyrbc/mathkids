@@ -2,8 +2,47 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  margin: 0;
-  min-width: 320px;
-  min-height: 100vh;
+/* Efekt tablicy kredowej */
+.chalk-texture {
+  background-image:
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
 }
+
+/* Efekt kredy na tekście */
+.chalk-text {
+  text-shadow:
+    1px 1px 1px rgba(255,255,255,0.1),
+    -1px -1px 1px rgba(0,0,0,0.2),
+    0 0 8px rgba(255,255,255,0.05);
+  letter-spacing: 0.02em;
+}
+
+/* Animacja wpisywania cyfry kredą */
+@keyframes chalkIn {
+  0% { opacity: 0; transform: scale(0.7) rotate(-3deg); }
+  60% { transform: scale(1.1) rotate(1deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+
+.chalk-in {
+  animation: chalkIn 0.25s ease-out forwards;
+}
+
+/* Kratka zeszytu */
+.notebook-grid {
+  background-color: #fdf6e3;
+  background-image:
+    repeating-linear-gradient(#b3c5e8 0px, #b3c5e8 1px, transparent 1px, transparent 32px),
+    repeating-linear-gradient(90deg, #b3c5e8 0px, #b3c5e8 1px, transparent 1px, transparent 32px);
+}
+
+/* Linia marginalna zeszytu */
+.notebook-margin {
+  border-left: 2px solid #e57373;
+  padding-left: 32px;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
