@@ -6,8 +6,7 @@ import { LearnPage } from './pages/LearnPage';
 import { TheoryPage } from './pages/TheoryPage';
 import { PracticePage } from './pages/PracticePage';
 import { TestPage } from './pages/TestPage';
-// Pozostałe strony — zostaną dodane w kolejnych plikach
-// import { StatsPage } from './pages/StatsPage';
+import { StatsPage } from './pages/StatsPage';
 // import { SettingsPage } from './pages/SettingsPage';
 
 // Guard — przekieruj do profili jeśli brak aktywnego
@@ -39,6 +38,9 @@ export default function App() {
         } />
         <Route path="/test" element={
           <ProtectedRoute><TestPage /></ProtectedRoute>
+        } />
+        <Route path="/stats" element={
+          <ProtectedRoute><StatsPage /></ProtectedRoute>
         } />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

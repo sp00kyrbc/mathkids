@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { initBadges } from '../data/badges';
 
 // ─── TYPY ───────────────────────────────────
 
@@ -88,7 +89,7 @@ function createDefaultProfile(data: Omit<ChildProfile, 'id' | 'xp' | 'level' | '
     level: 1,
     streak: 0,
     lastPlayedAt: null,
-    badges: [],
+    badges: initBadges(),
     stats: {
       addition: { correct: 0, total: 0 },
       subtraction: { correct: 0, total: 0 },

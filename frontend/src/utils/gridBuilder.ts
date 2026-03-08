@@ -1,4 +1,4 @@
-import { Task, GridCell } from '../types/task';
+import type { Task, GridCell } from '../types/task';
 
 /**
  * Buduje siatkę komórek dla działania pisemnego.
