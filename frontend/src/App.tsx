@@ -2,10 +2,11 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useAppStore } from './store/useAppStore';
 import { ProfilesPage } from './pages/ProfilesPage';
 import { MenuPage } from './pages/MenuPage';
+import { LearnPage } from './pages/LearnPage';
+import { TheoryPage } from './pages/TheoryPage';
+import { PracticePage } from './pages/PracticePage';
+import { TestPage } from './pages/TestPage';
 // Pozostałe strony — zostaną dodane w kolejnych plikach
-// import { LearnPage } from './pages/LearnPage';
-// import { PracticePage } from './pages/PracticePage';
-// import { TestPage } from './pages/TestPage';
 // import { StatsPage } from './pages/StatsPage';
 // import { SettingsPage } from './pages/SettingsPage';
 
@@ -24,7 +25,21 @@ export default function App() {
         <Route path="/menu" element={
           <ProtectedRoute><MenuPage /></ProtectedRoute>
         } />
-        {/* Pozostałe trasy dodawane w kolejnych plikach docs/ */}
+        <Route path="/learn" element={
+          <ProtectedRoute><LearnPage /></ProtectedRoute>
+        } />
+        <Route path="/theory" element={
+          <ProtectedRoute><TheoryPage /></ProtectedRoute>
+        } />
+        <Route path="/tutorial" element={
+          <ProtectedRoute><PracticePage isTutorial={true} /></ProtectedRoute>
+        } />
+        <Route path="/practice" element={
+          <ProtectedRoute><PracticePage /></ProtectedRoute>
+        } />
+        <Route path="/test" element={
+          <ProtectedRoute><TestPage /></ProtectedRoute>
+        } />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>

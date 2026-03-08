@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { Task, GridCell } from '../types/task';
+import type { Task, GridCell } from '../types/task';
 import { MathGrid } from './MathGrid';
 import { buildGrid } from '../utils/gridBuilder';
 import { useTheme } from '../hooks/useTheme';
