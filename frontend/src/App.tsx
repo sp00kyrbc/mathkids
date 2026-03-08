@@ -7,7 +7,7 @@ import { TheoryPage } from './pages/TheoryPage';
 import { PracticePage } from './pages/PracticePage';
 import { TestPage } from './pages/TestPage';
 import { StatsPage } from './pages/StatsPage';
-// import { SettingsPage } from './pages/SettingsPage';
+import { SettingsPage } from './pages/SettingsPage';
 
 // Guard — przekieruj do profili jeśli brak aktywnego
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -41,6 +41,9 @@ export default function App() {
         } />
         <Route path="/stats" element={
           <ProtectedRoute><StatsPage /></ProtectedRoute>
+        } />
+        <Route path="/settings" element={
+          <ProtectedRoute><SettingsPage /></ProtectedRoute>
         } />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

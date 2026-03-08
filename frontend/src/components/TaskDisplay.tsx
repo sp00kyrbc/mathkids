@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import type { Task, GridCell } from '../types/task';
 import { MathGrid } from './MathGrid';
@@ -18,7 +18,7 @@ interface TaskDisplayProps {
 
 export function TaskDisplay({
   task, mode, currentStepId,
-  onStepComplete, onTaskComplete,
+  onStepComplete, onTaskComplete: _onTaskComplete,
   feedbackMode = 'immediate'
 }: TaskDisplayProps) {
   const { classes, theme } = useTheme();
@@ -26,18 +26,6 @@ export function TaskDisplay({
   const [activeCell, setActiveCell] = useState<{ row: number; col: number } | null>(null);
   const [feedback, setFeedback] = useState<{ message: string; type: 'success' | 'error' | 'hint' } | null>(null);
   const [isValidating, setIsValidating] = useState(false);
-
-  // Znajdź aktualną aktywną komórkę na podstawie kroku
-  const activateStepCell = useCallback((stepId: number) => {
-    for (const row of grid) {
-      for (const cell of row) {
-        if (cell.stepId === stepId && cell.editable) {
-          setActiveCell({ row: cell.row, col: cell.col });
-          return;
-        }
-      }
-    }
-  }, [grid]);
 
   async function handleCellInput(row: number, col: number, value: string) {
     if (value === '__focus__') {

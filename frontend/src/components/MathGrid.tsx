@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { GridCell, CellState } from '../types/task';
+import type { GridCell, CellState } from '../types/task';
 import { useTheme } from '../hooks/useTheme';
 
 interface MathGridProps {
@@ -13,7 +13,7 @@ interface MathGridProps {
 }
 
 // Kolory komórek zależnie od stanu i motywu
-function getCellClasses(cell: GridCell, isActive: boolean, theme: string): string {
+function getCellClasses(cell: GridCell, _isActive: boolean, theme: string): string {
   const base = 'flex items-center justify-center font-bold text-xl transition-all duration-150 select-none';
   const sizeClass = 'w-12 h-12 rounded';
 

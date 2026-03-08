@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Layout } from '../components/Layout';
@@ -19,6 +20,26 @@ export function MenuPage() {
   const clearActiveProfile = useAppStore(s => s.clearActiveProfile);
   const { classes } = useTheme();
 
+  const [greeting, setGreeting] = useState('');
+  const API = import.meta.env.VITE_API_URL;
+
+  useEffect(() => {
+    if (!activeProfile) return;
+    fetch(`${API}/api/ai/message`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type: 'greeting',
+        childName: activeProfile.name,
+        childAge: activeProfile.age,
+        level: activeProfile.level,
+      })
+    })
+      .then(r => r.json())
+      .then(data => setGreeting(data.message))
+      .catch(() => setGreeting(`Cześć, ${activeProfile.name}! Co robimy dziś? 🎯`));
+  }, [activeProfile?.id]);
+
   return (
     <Layout>
       <div className="max-w-md mx-auto">
@@ -27,7 +48,7 @@ export function MenuPage() {
           animate={{ opacity: 1, y: 0 }}
           className={`text-2xl font-bold ${classes.text} mb-6 text-center`}
         >
-          Cześć, {activeProfile?.name}! Co robimy?
+          {greeting || `Cześć, ${activeProfile?.name}!`}
         </motion.h2>
 
         <div className="grid grid-cols-2 gap-4">
